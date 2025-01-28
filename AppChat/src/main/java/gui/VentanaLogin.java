@@ -28,19 +28,6 @@ public class VentanaLogin {
 	private JTextField telefono;
 	private JPasswordField password;
 	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaLogin window = new VentanaLogin();
-					window.frameLogin.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
 	public VentanaLogin () {
 		initialize();
 	}
@@ -119,6 +106,9 @@ public class VentanaLogin {
 		frameLogin.add(Box.createHorizontalStrut(75), BorderLayout.WEST);
 		frameLogin.add(panelCentral, BorderLayout.CENTER);
 		frameLogin.add(panelSur, BorderLayout.SOUTH);
-		
+	}
+	
+	public void show() {
+		frameLogin.setVisible(true);
 	}
 }
