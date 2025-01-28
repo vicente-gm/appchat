@@ -21,6 +21,9 @@ import javax.swing.border.TitledBorder;
 
 
 public class VentanaLogin {
+	private static final int LOGIN_WIDTH = 400;
+	private static final int LOGIN_HEIGHT = 400;
+	
 	private JFrame frameLogin;
 	private JTextField telefono;
 	private JPasswordField password;
@@ -45,14 +48,25 @@ public class VentanaLogin {
 	private void initialize() {
 		frameLogin = new JFrame();
 		frameLogin.setTitle("AppChat");
-		frameLogin.setSize(300, 300);
+		frameLogin.setSize(LOGIN_HEIGHT, LOGIN_WIDTH);
+		frameLogin.setResizable(false);
 		frameLogin.setLocationByPlatform(true);
 		frameLogin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frameLogin.setLayout(new BorderLayout());
 		
+		// Titulo
+		JPanel panelNorte = new JPanel();
+		panelNorte.setLayout(new BorderLayout());
+		
 		JLabel titulo = new JLabel("AppChat", SwingConstants.CENTER);
 		titulo.setFont(new Font("Arial", Font.BOLD, 24));
+	
+		panelNorte.add(Box.createVerticalStrut(10), BorderLayout.NORTH);
+		panelNorte.add(titulo, BorderLayout.CENTER);
+		panelNorte.add(Box.createVerticalStrut(70), BorderLayout.SOUTH);
 		
+		
+		// Panel central
 		JPanel panelCentral = new JPanel();
 		JPanel panelCentralSup = new JPanel();
 		JPanel panelCentralInf = new JPanel();
@@ -61,6 +75,7 @@ public class VentanaLogin {
 		panelCentralSup.setLayout(new FlowLayout(FlowLayout.CENTER));
 		panelCentralInf.setLayout(new FlowLayout(FlowLayout.CENTER));
 		
+		// Campos para rellenar
 		telefono = new JTextField();
 		telefono.setColumns(10);
 		password = new JPasswordField();
@@ -73,13 +88,16 @@ public class VentanaLogin {
 		panelCentralInf.add(lblPssw);
 		panelCentralInf.add(password);
 		
+		panelCentral.add(Box.createVerticalStrut(10));
 		panelCentral.add(panelCentralSup);
 		panelCentral.add(panelCentralInf);
+		panelCentral.add(Box.createVerticalStrut(10));
 		
+		// Botones
 		JPanel panelSur = new JPanel();
 		JPanel panelSurIzq = new JPanel();
 		JPanel panelSurDer = new JPanel();
-		panelSur.setLayout(new BoxLayout(panelSur, BoxLayout.X_AXIS));
+		panelSur.setLayout(new BorderLayout());
 		panelSurIzq.setLayout(new FlowLayout(FlowLayout.LEFT));
 		panelSurDer.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		
@@ -91,10 +109,12 @@ public class VentanaLogin {
 		panelSurDer.add(cancelar);
 		panelSurDer.add(aceptar);
 		
-		panelSur.add(panelSurIzq);
-		panelSur.add(panelSurDer);
+		panelSur.add(Box.createVerticalStrut(75), BorderLayout.NORTH);
+		panelSur.add(panelSurIzq, BorderLayout.WEST);
+		panelSur.add(panelSurDer, BorderLayout.EAST);
 		
-		frameLogin.add(titulo, BorderLayout.NORTH);
+		// Añadimos los paneles al frame
+		frameLogin.add(panelNorte, BorderLayout.NORTH);
 		frameLogin.add(Box.createHorizontalStrut(75), BorderLayout.EAST);
 		frameLogin.add(Box.createHorizontalStrut(75), BorderLayout.WEST);
 		frameLogin.add(panelCentral, BorderLayout.CENTER);
