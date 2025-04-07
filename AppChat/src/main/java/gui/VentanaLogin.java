@@ -18,6 +18,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 
 public class VentanaLogin {
@@ -89,8 +91,28 @@ public class VentanaLogin {
 		panelSurDer.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		
 		JButton aceptar = new JButton("Aceptar");
+		aceptar.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        
+		    }
+		});
+		
 		JButton cancelar = new JButton("Cancelar");
-		JButton registrar = new JButton("Registrar");
+		cancelar.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        frameLogin.dispose();
+		    }
+		});
+		
+		JButton registrar = new JButton("Registrarse");
+		
+		registrar.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        VentanaRegistro ventanaRegistro = new VentanaRegistro(frameLogin);
+		        ventanaRegistro.setVisible(true);
+		        frameLogin.setVisible(false);
+		    }
+		});
 		
 		panelSurIzq.add(registrar);
 		panelSurDer.add(cancelar);
@@ -107,6 +129,7 @@ public class VentanaLogin {
 		frameLogin.add(panelCentral, BorderLayout.CENTER);
 		frameLogin.add(panelSur, BorderLayout.SOUTH);
 	}
+
 	
 	public void show() {
 		frameLogin.setVisible(true);

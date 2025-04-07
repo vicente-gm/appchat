@@ -1,28 +1,27 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 
 import com.toedter.calendar.JDateChooser;
 
 public class VentanaRegistro extends JDialog {
 
-	private static final long serialVersionUID = 1L;
-
-	public static void main(String[] args) {
-		try {
-			VentanaRegistro dialog = new VentanaRegistro();
-			
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private JFrame ventanaPrevia;
+	
+	public VentanaRegistro(JFrame ventanaPrevia) {
+		this.ventanaPrevia = ventanaPrevia;
+		initialize();
 	}
-
-	public VentanaRegistro() {
+	
+	private void initialize() {
 		setBounds(100, 100, 600, 500);
 		setTitle("Registro");
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		
 		JPanel panelCentral = new JPanel();
 		panelCentral.setLayout(new GridBagLayout());
 		
@@ -140,9 +139,9 @@ public class VentanaRegistro extends JDialog {
         gbc.gridheight = 1;
         panelCentral.add(labelImagen, gbc);
         
-        // TODO Sustituir imagen de prueba por imagen final
         // Se trata de una imagen con relación de aspecto 3:4
-        Image resizedImagen = new ImageIcon("/tmp/test.jpeg").getImage().getScaledInstance(125, 125*(4/3), Image.SCALE_SMOOTH);
+        ImageIcon imagen = new ImageIcon(getClass().getResource("/usuarios/user.jpeg"));
+        Image resizedImagen = imagen.getImage().getScaledInstance(125, 125*(4/3), Image.SCALE_SMOOTH);
         JLabel placeholderImagen = new JLabel(new ImageIcon(resizedImagen));
         gbc.gridx = 4;
         gbc.gridy = 5;
@@ -157,6 +156,29 @@ public class VentanaRegistro extends JDialog {
         gbc.gridwidth = 2;
         gbc.gridheight = 1;
         panelCentral.add(buttonCambiar, gbc);
+        
+        buttonCambiar.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+	            JFileChooser fileChooser = new JFileChooser();
+	            fileChooser.setDialogTitle("Seleccionar una foto de perfil");
+	            
+	            int result = fileChooser.showOpenDialog(VentanaRegistro.this);
+	            
+	            if (result == JFileChooser.APPROVE_OPTION) {
+            		String ruta = fileChooser.getSelectedFile().getAbsolutePath();
+
+	            	if (ruta.toLowerCase().endsWith(".jpeg") || ruta.toLowerCase().endsWith(".jpg") || ruta.toLowerCase().endsWith(".png")) {
+	            		ImageIcon nuevaImagen = new ImageIcon(ruta);
+	            		Image nuevaImagenRedimensionada = nuevaImagen.getImage().getScaledInstance(125, 125 * (4/3), Image.SCALE_SMOOTH);
+	                    
+	                    placeholderImagen.setIcon(new ImageIcon(nuevaImagenRedimensionada));
+	            	} else {
+	            		JOptionPane.showMessageDialog(VentanaRegistro.this, "Formato de archivo inválido.");
+	            	}
+	            }
+		    }
+		});
+		
         
         add(panelCentral, BorderLayout.CENTER);
 
@@ -173,6 +195,13 @@ public class VentanaRegistro extends JDialog {
         gbc.insets = new Insets(40, 5, 5, 5);
         panelBotones.add(buttonCancelar, gbc);
         
+        buttonCancelar.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	ventanaPrevia.setVisible(true);
+		    	dispose();
+		    }
+		});
+        
         JButton buttonAceptar = new JButton("Aceptar");
         gbc.gridx = 2;
         panelBotones.add(buttonAceptar, gbc);
@@ -181,5 +210,6 @@ public class VentanaRegistro extends JDialog {
         add(panelBotones, BorderLayout.SOUTH);
 
 	}
+
 
 }
