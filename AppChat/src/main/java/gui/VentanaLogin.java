@@ -93,7 +93,8 @@ public class VentanaLogin {
 		JButton aceptar = new JButton("Aceptar");
 		aceptar.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		        
+		    	VentanaAppChat ventanaAppChat = new VentanaAppChat(frameLogin);
+		        ventanaAppChat.setVisible(true);
 		    }
 		});
 		
