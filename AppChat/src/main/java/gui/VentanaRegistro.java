@@ -1,14 +1,20 @@
 package gui;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
+import java.util.List;
+import java.io.File;
 
 import javax.swing.*;
+import java.awt.*;
+
 
 import com.toedter.calendar.JDateChooser;
 
-public class VentanaRegistro extends JDialog {
+import dominio.RepositorioUsuarios;
+
+public class VentanaRegistro extends JFrame {
 
 	private JFrame ventanaPrevia;
 	
@@ -159,13 +165,13 @@ public class VentanaRegistro extends JDialog {
         
         buttonCambiar.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-	            JFileChooser fileChooser = new JFileChooser();
-	            fileChooser.setDialogTitle("Seleccionar una foto de perfil");
 	            
-	            int result = fileChooser.showOpenDialog(VentanaRegistro.this);
+		    	PanelArrastrarImagen ventanaSelecionarImagen = new PanelArrastrarImagen(VentanaRegistro.this);
+	            List<File> imagenesElegidas = ventanaSelecionarImagen.showDialog();
 	            
-	            if (result == JFileChooser.APPROVE_OPTION) {
-            		String ruta = fileChooser.getSelectedFile().getAbsolutePath();
+	            if (!imagenesElegidas.isEmpty()) {
+	            	File imagenElegida = imagenesElegidas.get(0);
+            		String ruta = imagenElegida.getAbsolutePath();
 
 	            	if (ruta.toLowerCase().endsWith(".jpeg") || ruta.toLowerCase().endsWith(".jpg") || ruta.toLowerCase().endsWith(".png")) {
 	            		ImageIcon nuevaImagen = new ImageIcon(ruta);
@@ -206,6 +212,47 @@ public class VentanaRegistro extends JDialog {
         gbc.gridx = 2;
         panelBotones.add(buttonAceptar, gbc);
         gbc.insets = new Insets(5, 5, 5, 5);
+        
+        buttonAceptar.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        String nombre = fieldNombre.getText().trim();
+		        String apellidos = fieldApellidos.getText().trim();
+		        String telefono = fieldTlf.getText().trim();
+		        String pass = new String(fieldPass.getPassword());
+		        String passRep = new String(fieldPassRep.getPassword());
+		        Date fechaNacimiento = chooserFecha.getDate();
+		        String saludo = areaSaludo.getText().trim();
+
+		        // Verificar todo compleot
+		        if (nombre.trim().isEmpty() || apellidos.trim().isEmpty() || telefono.trim().isEmpty()
+		                || pass.trim().isEmpty() || passRep.trim().isEmpty() || fechaNacimiento == null || saludo.trim().isEmpty()) {
+		            JOptionPane.showMessageDialog(VentanaRegistro.this, "Rellene todos los campos.");
+		            return;
+		        }
+
+		        // Validar telefono
+		        if (!telefono.matches("\\d+")) {
+		            JOptionPane.showMessageDialog(VentanaRegistro.this, "El teléfono solo puede contener números.");
+		            return;
+		        }
+
+		        // Las contraseñas deben ser iguales
+		        if (!pass.equals(passRep)) {
+		            JOptionPane.showMessageDialog(VentanaRegistro.this, "Las contraseñas no coinciden.");
+		            return;
+		        }
+
+		        // Todo bien, creamos el usuario
+		        // TODO ALMACENAR IMAGEN ELEGIDA
+		        dominio.Usuario nuevoUsuario = new dominio.Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, "/usuarios/user.jpeg");
+		        // Repositorio.addUsuario(nuevoUsuario)
+	            JOptionPane.showMessageDialog(VentanaRegistro.this, "¡Usuario registrado correctamente!");
+	            
+	            // Volver al login
+		    	ventanaPrevia.setVisible(true);
+		    	dispose();
+		    }
+        });
         
         add(panelBotones, BorderLayout.SOUTH);
 
