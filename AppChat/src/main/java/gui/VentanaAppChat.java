@@ -35,7 +35,7 @@ public class VentanaAppChat extends JDialog {
         JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         // Hacemos resize a la imagen de usuario
-        ImageIcon imagen = new ImageIcon(getClass().getResource("/usuarios/user.jpeg"));
+        ImageIcon imagen = new ImageIcon(getClass().getResource(controlador.getImagen()));
         Image resizedImagen = imagen.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         JLabel usuarioActual = new JLabel(new ImageIcon(resizedImagen));
         panelSuperior.add(usuarioActual);
@@ -151,7 +151,7 @@ public class VentanaAppChat extends JDialog {
         JPanel listaContactosPanel = new JPanel();
         listaContactosPanel.setLayout(new BoxLayout(listaContactosPanel, BoxLayout.Y_AXIS));
 
-        for (Contacto c : AppChat.INSTANCE.getContactos()) { 
+        for (Contacto c : controlador.getContactos()) { 
         	
         	JPanel contactoPanel = new JPanel();
         	contactoPanel.setLayout(new BorderLayout());
@@ -183,13 +183,13 @@ public class VentanaAppChat extends JDialog {
             // Nombre contacto
             JLabel nombreLabel = new JLabel(nombreContacto);
             nombreLabel.setFont(nombreLabel.getFont().deriveFont(Font.BOLD, 18f));
+            nombreLabel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
             contactoPanel.add(nombreLabel, BorderLayout.NORTH);
             
-        	System.out.println(fotoUsuario);
-
+            
             // Foto contacto
         	ImageIcon imagenContacto = new ImageIcon(getClass().getResource(fotoUsuario));
-            JLabel fotoContactoLabel = new JLabel(new ImageIcon(imagen.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+            JLabel fotoContactoLabel = new JLabel(new ImageIcon(imagenContacto.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
             fotoContactoLabel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
             contactoPanel.add(fotoContactoLabel, BorderLayout.WEST);
 
@@ -244,16 +244,16 @@ public class VentanaAppChat extends JDialog {
         chatConLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         chatPanel.add(chatConLabel, BorderLayout.NORTH);
 
-        JPanel mensajesPanel = new JPanel();
-        mensajesPanel.setLayout(new BoxLayout(mensajesPanel, BoxLayout.Y_AXIS));
+        JPanel chat = new JPanel();
+        chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
 
-        mensajesPanel.add(new BubbleText(mensajesPanel, "Hola grupo!!", Color.GREEN, "J.Ramón", BubbleText.SENT));
-        mensajesPanel.add(new BubbleText(mensajesPanel, "Hola prueba", Color.LIGHT_GRAY, "J", BubbleText.RECEIVED));
-        mensajesPanel.add(new BubbleText(mensajesPanel, "Probando", Color.GREEN, "J.Ramón", BubbleText.SENT));
-        mensajesPanel.add(new BubbleText(mensajesPanel, "Test", Color.LIGHT_GRAY, "J", BubbleText.RECEIVED));
-        chatPanel.add(mensajesPanel, BorderLayout.CENTER);
+        chat.add(new BubbleText(chat, "Hola grupo!!", Color.GREEN, "J.Ramón", BubbleText.SENT));
+        chat.add(new BubbleText(chat, "Hola prueba", Color.LIGHT_GRAY, "J", BubbleText.RECEIVED));
+        chat.add(new BubbleText(chat, "Probando", Color.GREEN, "J.Ramón", BubbleText.SENT));
+        chat.add(new BubbleText(chat, "Test", Color.LIGHT_GRAY, "J", BubbleText.RECEIVED));
+        chatPanel.add(chat, BorderLayout.CENTER);
 
-        JScrollPane scrollMensajes = new JScrollPane(mensajesPanel);
+        JScrollPane scrollMensajes = new JScrollPane(chat);
         scrollMensajes.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollMensajes.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         chatPanel.add(scrollMensajes, BorderLayout.CENTER);

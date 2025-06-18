@@ -77,6 +77,10 @@ public enum AppChat {
 		return false;
 	}
 	
+	public String getImagen() {
+		return this.usuarioActual.getImagen();
+	}
+	
 	public void cambiarImagen(String img) {
 		this.usuarioActual.setImagen(img);
 	}
