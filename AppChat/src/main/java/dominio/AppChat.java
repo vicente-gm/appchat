@@ -1,6 +1,8 @@
 package dominio;
 
 import java.awt.EventQueue;
+import java.time.LocalDate;
+import java.util.Date;
 
 import gui.VentanaLogin;
 
@@ -55,5 +57,15 @@ public enum AppChat {
 		return false;
 	}
 	
+	public void cambiarImagen(String img) {
+		this.usuarioActual.setImagen(img);
+	}
 	
+	public String getSaludo() {
+		return this.usuarioActual.getSaludo();
+	}
+	
+	public void cambiarSaludo(String msg) {
+		this.usuarioActual.setSaludo(msg);
+	}
 }
