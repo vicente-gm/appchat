@@ -241,11 +241,16 @@ public class VentanaRegistro extends JFrame {
 		            JOptionPane.showMessageDialog(VentanaRegistro.this, "Las contraseñas no coinciden.");
 		            return;
 		        }
+		        
+		        if (dominio.AppChat.INSTANCE.buscarUsuario(telefono) != null) {
+		            JOptionPane.showMessageDialog(VentanaRegistro.this, "El telefono introducido ya existe.");
+		            return;
+		        }
 
 		        // Todo bien, creamos el usuario
-		        // TODO ALMACENAR IMAGEN ELEGIDA
+		        // TODO ALMACENAR IMAGEN ELEGIDA		        
 		        dominio.Usuario nuevoUsuario = new dominio.Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, "/usuarios/user.jpeg");
-		        // Repositorio.addUsuario(nuevoUsuario)
+		        dominio.AppChat.INSTANCE.registrarUsuario(nuevoUsuario);
 	            JOptionPane.showMessageDialog(VentanaRegistro.this, "¡Usuario registrado correctamente!");
 	            
 	            // Volver al login

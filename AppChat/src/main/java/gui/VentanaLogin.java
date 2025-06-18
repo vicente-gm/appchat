@@ -13,6 +13,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -93,8 +94,17 @@ public class VentanaLogin {
 		JButton aceptar = new JButton("Aceptar");
 		aceptar.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		    	VentanaAppChat ventanaAppChat = new VentanaAppChat(frameLogin);
-		        ventanaAppChat.setVisible(true);
+		    	
+		        boolean exito = dominio.AppChat.INSTANCE.login(telefono.getText(), new String(password.getPassword()));
+		        if (exito) {
+			        frameLogin.dispose();
+
+		        	VentanaAppChat ventanaAppChat = new VentanaAppChat(frameLogin);
+			        ventanaAppChat.setVisible(true);
+		        } else {
+		        	JOptionPane.showMessageDialog(null, "Teléfono o clave incorrectos");
+		        }
+		        
 		    }
 		});
 		
