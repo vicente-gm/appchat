@@ -96,6 +96,7 @@ public class VentanaLogin {
 		    public void actionPerformed(ActionEvent e) {
 		    	
 		        boolean exito = dominio.AppChat.INSTANCE.login(telefono.getText(), new String(password.getPassword()));
+		        
 		    	if (exito) {
 			        frameLogin.dispose();
 

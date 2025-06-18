@@ -39,24 +39,89 @@ public class VentanaAppChat extends JDialog {
         JLabel usuarioActual = new JLabel(new ImageIcon(resizedImagen));
         panelSuperior.add(usuarioActual);
         
-        // Funcionalidad para cambiar la imagen del usuario
-        usuarioActual.setCursor(new Cursor(Cursor.HAND_CURSOR));	// Hacemos que el Jlabel de la imagen sea clicable
-        
-        usuarioActual.addMouseListener(new java.awt.event.MouseAdapter() {	// Desplegamos un fileChooser para elegir la nueva imagen
+        // Funcionalidad para cambiar la imagen del usuario y el saludo
+        usuarioActual.setCursor(new Cursor(Cursor.HAND_CURSOR));	// Hacemos que el JLabel de la imagen sea clicable
+        usuarioActual.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                JFileChooser fileChooser = new JFileChooser();
-                int opcion = fileChooser.showOpenDialog(VentanaAppChat.this);
-                if (opcion == JFileChooser.APPROVE_OPTION) {
-                    File archivoSeleccionado = fileChooser.getSelectedFile();
-                    ImageIcon nuevaImagen = new ImageIcon(archivoSeleccionado.getAbsolutePath());
-                    Image imagenRedimensionada = nuevaImagen.getImage().getScaledInstance(125, 125*(4/3), Image.SCALE_SMOOTH);
-                    usuarioActual.setIcon(new ImageIcon(imagenRedimensionada));
-                    
-                    // TODO: mirar cómo se va a almacenar la imagen en persistencia. Ahora mismo está con rutas absolutas
-                    String rutaImagen = archivoSeleccionado.getAbsolutePath();
-                    controlador.cambiarImagen(rutaImagen);
-                }
+                // Creamos una ventana de diálogo
+                JDialog dialogo = new JDialog(VentanaAppChat.this, "Editar perfil", true);
+                dialogo.setLayout(new GridBagLayout());
+                dialogo.setSize(450, 250);
+                dialogo.setLocationRelativeTo(VentanaAppChat.this);
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.insets = new Insets(10, 10, 10, 10);
+
+                // Cambios temporales
+                final ImageIcon[] nuevaIcono = { (ImageIcon) usuarioActual.getIcon() };
+                final String[] rutaImagenSeleccionada = { null };
+
+                // Primera fila: imagen actual del usuario
+                JLabel imagenLabel = new JLabel(usuarioActual.getIcon());
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                dialogo.add(imagenLabel, gbc);
+
+                // Primera fila: botón para abrir un fileChooser y elegir una imagen
+                JButton cambiarImagenBtn = new JButton("Cambiar imagen");
+                gbc.gridx = 1;
+                gbc.gridy = 0;
+                dialogo.add(cambiarImagenBtn, gbc);
+
+                cambiarImagenBtn.addActionListener(e -> {
+                    JFileChooser fileChooser = new JFileChooser();
+                    int opcion = fileChooser.showOpenDialog(dialogo);
+                    if (opcion == JFileChooser.APPROVE_OPTION) {
+                        File archivoSeleccionado = fileChooser.getSelectedFile();
+                        ImageIcon nuevaImagen = new ImageIcon(archivoSeleccionado.getAbsolutePath());
+                        Image imagenRedimensionada = nuevaImagen.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                        nuevaIcono[0] = new ImageIcon(imagenRedimensionada);
+                        imagenLabel.setIcon(nuevaIcono[0]);
+                        rutaImagenSeleccionada[0] = archivoSeleccionado.getAbsolutePath();
+                    }
+                });
+
+                // Segunda fila: cuadro de texto con el saludo actual
+                String saludoActual = controlador.getSaludo();
+                JTextField campoSaludo = new JTextField(saludoActual, 20);
+                gbc.gridx = 0;
+                gbc.gridy = 1;
+                gbc.gridwidth = 2;
+                gbc.fill = GridBagConstraints.HORIZONTAL;
+                dialogo.add(campoSaludo, gbc);
+
+                // Tercera fila: botones de Aceptar y Cancelar
+                JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                JButton aceptarBtn = new JButton("Aceptar");
+                JButton cancelarBtn = new JButton("Cancelar");
+                botonesPanel.add(aceptarBtn);
+                botonesPanel.add(cancelarBtn);
+
+                gbc.gridx = 0;
+                gbc.gridy = 2;
+                gbc.gridwidth = 2;
+                gbc.fill = GridBagConstraints.NONE;
+                dialogo.add(botonesPanel, gbc);
+
+                // Si pulsamos Cancelar, descartamos los cambios y cerramos la ventana de diálogo
+                cancelarBtn.addActionListener(e -> dialogo.dispose());
+
+                // Si pulsamos Aceptar, debemos guardar la imagen y el saludo
+                aceptarBtn.addActionListener(e -> {
+                    if (rutaImagenSeleccionada[0] != null) {
+                        usuarioActual.setIcon(nuevaIcono[0]);
+                        controlador.cambiarImagen(rutaImagenSeleccionada[0]); // TODO: revisar el tema de cómo se almacena la imagen
+                    }
+
+                    String nuevoSaludo = campoSaludo.getText();
+                    if (!nuevoSaludo.equals(saludoActual)) {
+                        controlador.cambiarSaludo(nuevoSaludo);
+                    }
+
+                    dialogo.dispose();
+                });
+
+                dialogo.setVisible(true);
             }
         });
         
