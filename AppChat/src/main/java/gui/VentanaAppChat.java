@@ -4,16 +4,22 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dominio.AppChat;
+
 import java.awt.*;
+import java.io.File;
+
 import tds.BubbleText;
 
 public class VentanaAppChat extends JDialog {
 	
 	private JFrame ventanaPrevia;
 	private JTextArea areaTexto;
+	private AppChat controlador;
 	
 	public VentanaAppChat(JFrame ventanaPrevia) {
 		this.ventanaPrevia = ventanaPrevia;
+		this.controlador = AppChat.INSTANCE;
 		initialize();
 	}
 	
@@ -32,6 +38,27 @@ public class VentanaAppChat extends JDialog {
         Image resizedImagen = imagen.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         JLabel usuarioActual = new JLabel(new ImageIcon(resizedImagen));
         panelSuperior.add(usuarioActual);
+        
+        // Funcionalidad para cambiar la imagen del usuario
+        usuarioActual.setCursor(new Cursor(Cursor.HAND_CURSOR));	// Hacemos que el Jlabel de la imagen sea clicable
+        
+        usuarioActual.addMouseListener(new java.awt.event.MouseAdapter() {	// Desplegamos un fileChooser para elegir la nueva imagen
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JFileChooser fileChooser = new JFileChooser();
+                int opcion = fileChooser.showOpenDialog(VentanaAppChat.this);
+                if (opcion == JFileChooser.APPROVE_OPTION) {
+                    File archivoSeleccionado = fileChooser.getSelectedFile();
+                    ImageIcon nuevaImagen = new ImageIcon(archivoSeleccionado.getAbsolutePath());
+                    Image imagenRedimensionada = nuevaImagen.getImage().getScaledInstance(125, 125*(4/3), Image.SCALE_SMOOTH);
+                    usuarioActual.setIcon(new ImageIcon(imagenRedimensionada));
+                    
+                    // TODO: mirar cómo se va a almacenar la imagen en persistencia. Ahora mismo está con rutas absolutas
+                    String rutaImagen = archivoSeleccionado.getAbsolutePath();
+                    controlador.cambiarImagen(rutaImagen);
+                }
+            }
+        });
         
         JButton nuevoContactoButton = new JButton("Crear contacto");
         panelSuperior.add(nuevoContactoButton);

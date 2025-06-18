@@ -55,5 +55,7 @@ public enum AppChat {
 		return false;
 	}
 	
-	
+	public void cambiarImagen(String img) {
+		this.usuarioActual.setImagen(img);
+	}
 }

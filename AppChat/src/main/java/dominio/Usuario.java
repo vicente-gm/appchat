@@ -73,4 +73,7 @@ public class Usuario {
         contactos.add(contacto);
     }
 
+    public void setImagen(String img) {
+    	this.imagen = img;
+    }
 }
