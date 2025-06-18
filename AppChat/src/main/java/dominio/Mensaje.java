@@ -1,32 +1,22 @@
 package dominio;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Mensaje {
-	public static final int TIPO_TEXTO = 0;
-	public static final int TIPO_EMOTICONOS = 1;
-	
 	private String texto;
-	private Date fecha;
+	private final LocalDate fecha;
 	private int emoticono;
-	private int tipo;
-	private final String emisor, receptor;
+	private TipoMensaje tipo;
+	private final Usuario emisor, receptor;
 	
-	public Mensaje(String emisor, String receptor, String texto, int emoticono) {
-		this(emisor, receptor, texto);
-		
-		this.emoticono = emoticono;
-		this.tipo = TIPO_EMOTICONOS;
-	}
-	
-	public Mensaje(String emisor, String receptor, String texto) {
+	public Mensaje(Usuario emisor, Usuario receptor, String texto, int emoticono, TipoMensaje tipo) {
 		this.emisor = emisor;
 		this.receptor = receptor;
 		this.texto = texto;
-		this.fecha = new Date(); // Devuelve un objeto Date con la fecha y hora actual
-		this.tipo = TIPO_TEXTO;
-		this.emoticono = -1; // Significa que no hay emoticono
+		this.fecha = LocalDate.now(); // Devuelve un objeto Date con la fecha y hora actual
+		this.emoticono = emoticono;
+		this.tipo = tipo;
 	}
 	
 	public String getTexto() {
@@ -37,20 +27,20 @@ public class Mensaje {
 		return this.emoticono;
 	}
 	
-	public int getTipoMensaje() {
+	public TipoMensaje getTipoMensaje() {
 		return this.tipo;
 	}
 	
-	public String getEmisor() {
+	public Usuario getEmisor() {
 		return this.emisor;
 	}
 	
-	public String getReceptor() {
+	public Usuario getReceptor() {
 		return this.receptor;
 	}
 	
-	public Date getFechaEnvio() {
-		return new Date(this.fecha.getTime());
+	public LocalDate getFechaEnvio() {
+		return this.fecha;
 	}
 	
 	public String getHora() {

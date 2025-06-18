@@ -5,21 +5,23 @@ import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.List;
 import java.io.File;
+import java.time.ZoneId;
 
 import javax.swing.*;
 import java.awt.*;
 
 
 import com.toedter.calendar.JDateChooser;
-
-import dominio.RepositorioUsuarios;
+import dominio.*;
 
 public class VentanaRegistro extends JFrame {
 
 	private JFrame ventanaPrevia;
+	private String rutaImagen;
 	
 	public VentanaRegistro(JFrame ventanaPrevia) {
 		this.ventanaPrevia = ventanaPrevia;
+		this.rutaImagen = "/usuarios/user.jpeg";
 		initialize();
 	}
 	
@@ -146,7 +148,7 @@ public class VentanaRegistro extends JFrame {
         panelCentral.add(labelImagen, gbc);
         
         // Se trata de una imagen con relación de aspecto 3:4
-        ImageIcon imagen = new ImageIcon(getClass().getResource("/usuarios/user.jpeg"));
+        ImageIcon imagen = new ImageIcon(getClass().getResource(rutaImagen));
         Image resizedImagen = imagen.getImage().getScaledInstance(125, 125*(4/3), Image.SCALE_SMOOTH);
         JLabel placeholderImagen = new JLabel(new ImageIcon(resizedImagen));
         gbc.gridx = 4;
@@ -177,6 +179,7 @@ public class VentanaRegistro extends JFrame {
 	            		ImageIcon nuevaImagen = new ImageIcon(ruta);
 	            		Image nuevaImagenRedimensionada = nuevaImagen.getImage().getScaledInstance(125, 125 * (4/3), Image.SCALE_SMOOTH);
 	                    
+	            		rutaImagen = ruta;
 	                    placeholderImagen.setIcon(new ImageIcon(nuevaImagenRedimensionada));
 	            	} else {
 	            		JOptionPane.showMessageDialog(VentanaRegistro.this, "Formato de archivo inválido.");
@@ -242,15 +245,14 @@ public class VentanaRegistro extends JFrame {
 		            return;
 		        }
 		        
-		        if (dominio.AppChat.INSTANCE.buscarUsuario(telefono) != null) {
+		        if (AppChat.INSTANCE.buscarUsuario(telefono) != null) {
 		            JOptionPane.showMessageDialog(VentanaRegistro.this, "El telefono introducido ya existe.");
 		            return;
 		        }
 
 		        // Todo bien, creamos el usuario
 		        // TODO ALMACENAR IMAGEN ELEGIDA		        
-		        dominio.Usuario nuevoUsuario = new dominio.Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, "/usuarios/user.jpeg");
-		        dominio.AppChat.INSTANCE.registrarUsuario(nuevoUsuario);
+		        AppChat.INSTANCE.registrarUsuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), rutaImagen);
 	            JOptionPane.showMessageDialog(VentanaRegistro.this, "¡Usuario registrado correctamente!");
 	            
 	            // Volver al login

@@ -4,10 +4,11 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import dominio.AppChat;
+import dominio.*;
 
 import java.awt.*;
 import java.io.File;
+import java.util.stream.Collectors;
 
 import tds.BubbleText;
 
@@ -150,23 +151,58 @@ public class VentanaAppChat extends JDialog {
         JPanel listaContactosPanel = new JPanel();
         listaContactosPanel.setLayout(new BoxLayout(listaContactosPanel, BoxLayout.Y_AXIS));
 
-        for (int i = 1; i <= 7; i++) { // TODO RECORRER CONTACTOS DE VERDAD
+        for (Contacto c : AppChat.INSTANCE.getContactos()) { 
+        	
         	JPanel contactoPanel = new JPanel();
         	contactoPanel.setLayout(new BorderLayout());
             contactoPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+            contactoPanel.setMaximumSize(new Dimension(250, 100));
+            
+            String nombreContacto = c.getNombre();
+            String telefonoContacto = null;
+            String saludoContacto = null;
+            String miembrosGrupo = null;
+            String fotoUsuario = "/usuarios/user.jpeg"; // Por defecto la imagen de grupo
+            boolean agregado = true;
+            
+            // Tratamos si es un grupo o usuario individual
+            if (c instanceof ContactoIndividual) { // Si es un contacto individual ponemos la imagen y telefono de su usuario
+            	telefonoContacto = ((ContactoIndividual) c).getTelefono();
+            	saludoContacto = ((ContactoIndividual) c).getSaludo();
+            	fotoUsuario = ((ContactoIndividual) c).getImagen();
+            } else {
+            	miembrosGrupo = ((Grupo) c).getMiembros().stream().map(Contacto::getNombre).collect(Collectors.joining("<br>"));
+            }
+            
+            // Nos aseguramos si el contacto está agregado
+            if (nombreContacto == null) {
+            	agregado = false;
+            	nombreContacto = telefonoContacto;
+            }
             
             // Nombre contacto
-            JLabel nombreLabel = new JLabel("Usuario");
+            JLabel nombreLabel = new JLabel(nombreContacto);
             nombreLabel.setFont(nombreLabel.getFont().deriveFont(Font.BOLD, 18f));
             contactoPanel.add(nombreLabel, BorderLayout.NORTH);
             
+        	System.out.println(fotoUsuario);
+
             // Foto contacto
-        	ImageIcon imagenContacto = new ImageIcon(getClass().getResource("/usuarios/user.jpeg"));
+        	ImageIcon imagenContacto = new ImageIcon(getClass().getResource(fotoUsuario));
             JLabel fotoContactoLabel = new JLabel(new ImageIcon(imagen.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+            fotoContactoLabel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
             contactoPanel.add(fotoContactoLabel, BorderLayout.WEST);
 
             // Información del contacto
-            JLabel infoContactoLabel = new JLabel("<html>" + "Telefono: 123" + "<br>" + "Hola soy usuario!" + "</html>");
+            String textoInfoContacto = "<html>";
+            if (saludoContacto != null) { // Si es un contacto individual ponemos el telefono y estado como información
+            	textoInfoContacto += "Telefono: " + telefonoContacto + "<br>" + saludoContacto;
+            } else { // Si es un grupo ponemos los miembros como información
+            	textoInfoContacto += miembrosGrupo;
+            }
+            textoInfoContacto += "</html>";
+            
+            JLabel infoContactoLabel = new JLabel(textoInfoContacto);
             infoContactoLabel.setHorizontalAlignment(SwingConstants.LEFT);
             infoContactoLabel.setFont(infoContactoLabel.getFont().deriveFont(Font.PLAIN));
             contactoPanel.add(infoContactoLabel, BorderLayout.CENTER);
@@ -176,13 +212,14 @@ public class VentanaAppChat extends JDialog {
             panelNotificaciones.setLayout(new BoxLayout(panelNotificaciones, BoxLayout.Y_AXIS));
             panelNotificaciones.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
             
+            /*
             JLabel nuevosMensajesLabel = new JLabel(" 5 ");
             nuevosMensajesLabel.setOpaque(true);
             nuevosMensajesLabel.setBackground(Color.GREEN);
             nuevosMensajesLabel.setHorizontalAlignment(SwingConstants.CENTER);
             panelNotificaciones.add(nuevosMensajesLabel, BorderLayout.EAST);
-            
             panelNotificaciones.add(Box.createVerticalStrut(15));
+            */
 
             JButton anadirContactoButton = new JButton(" + ");
             panelNotificaciones.add(anadirContactoButton);

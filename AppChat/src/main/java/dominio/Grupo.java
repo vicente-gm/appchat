@@ -19,4 +19,8 @@ public class Grupo extends Contacto {
 	public List<ContactoIndividual> getMiembros() {
 		return this.miembros;
 	}
+	
+	public void addMiembro(ContactoIndividual contacto) {
+		miembros.add(contacto);
+	}
 }

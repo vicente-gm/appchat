@@ -3,7 +3,8 @@ package dominio;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositorioUsuarios {
+public enum RepositorioUsuarios {
+	INSTANCE;
 	private List<Usuario> usuarios = new ArrayList<Usuario>();
 
     public void guardarUsuario(Usuario usuario) {

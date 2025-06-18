@@ -1,5 +1,6 @@
 package dominio;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,13 +8,13 @@ import java.util.List;
 public class Usuario {
 
 	private String nombre, apellidos, telefono, clave, saludo;
-	private Date fechaNacimiento;
+	private LocalDate fechaNacimiento;
 	private String imagen;
 	private boolean premium;
 	
 	private List<Contacto> contactos; 
 	
-    public Usuario(String nombre, String apellidos, String telefono, String clave, String saludo, Date fechaNacimiento, String imagen) {
+    public Usuario(String nombre, String apellidos, String telefono, String clave, String saludo, LocalDate fechaNacimiento, String imagen) {
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.telefono = telefono;
@@ -46,7 +47,7 @@ public class Usuario {
         return saludo;
     }
 
-    public Date getFechaNacimiento() {
+    public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
 
@@ -66,10 +67,16 @@ public class Usuario {
         this.saludo = saludo;
     }
 
-    public void addContacto(Contacto contacto) {
-        if (contactos == null) {
-            contactos = new ArrayList<>();
+    public ContactoIndividual buscarContactoIndividual(String telefono) {
+        for (Contacto c : this.contactos) {
+            if (c instanceof ContactoIndividual && ((ContactoIndividual) c).getUsuario().getTelefono().equals(telefono)) {
+                return (ContactoIndividual) c;
+            }
         }
+        return null;
+    }
+    
+    public void addContacto(Contacto contacto) {
         contactos.add(contacto);
     }
 

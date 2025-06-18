@@ -19,4 +19,16 @@ public class ContactoIndividual extends Contacto {
     public Usuario getUsuario() {
         return usuario;
     }
+    
+    public String getTelefono() {
+	    return this.usuario.getTelefono();
+    }
+    
+    public String getSaludo() {
+	    return this.usuario.getSaludo();
+    }
+    
+    public String getImagen() {
+	    return this.usuario.getImagen();
+    }
 }
