@@ -6,19 +6,35 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import gui.VentanaLogin;
+import persistencia.*;
 
 
 public enum AppChat {
 	INSTANCE;
 	public static double COSTE_PREMIUM = 100.0;
-	// public static final String DAO_TDS = "um.tds.appchat.persistencia.impl.FactoriaDAO_TDS";
-	// private FactoriaDAO factoriaDAO;
-	// private UsuarioDAO usuarioDAO;
-	// private ContactoIndividualDAO contactoIndividualDAO;
-	// private GrupoDAO grupoDAO;
-	// private MensajeDAO mensajeDAO;
+	public static final String DAO_TDS = "persistencia.FactoriaDAO_TDS";
+	private FactoriaDAO factoriaDAO;
+	private UsuarioDAO usuarioDAO;
+	private ContactoIndividualDAO contactoIndividualDAO;
+	private GrupoDAO grupoDAO;
+	private MensajeDAO mensajeDAO;
 	private Usuario usuarioActual;
 	private Contacto contactoActual;
+	
+	
+	private AppChat() {
+		
+		try {
+			factoriaDAO = FactoriaDAO.getInstancia(DAO_TDS);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		usuarioDAO = factoriaDAO.crearUsuarioDAO();
+		contactoIndividualDAO = factoriaDAO.crearContactoIndividualDAO();
+		grupoDAO = factoriaDAO.crearGrupoDAO();
+		mensajeDAO = factoriaDAO.crearMensajeDAO();
+	}
 	
 	public static void main(String[] args) {
 		CargarAppChat.cargar();
