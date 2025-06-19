@@ -13,6 +13,7 @@ import java.awt.*;
 
 import com.toedter.calendar.JDateChooser;
 import dominio.*;
+import tds.BubbleText;
 
 public class VentanaRegistro extends JFrame {
 
@@ -27,7 +28,7 @@ public class VentanaRegistro extends JFrame {
 	
 	private void initialize() {
 		setBounds(100, 100, 600, 500);
-		setTitle("Registro");
+		setTitle("AppChat | Registro");
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		
 		JPanel panelCentral = new JPanel();

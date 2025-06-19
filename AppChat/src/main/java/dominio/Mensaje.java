@@ -8,9 +8,10 @@ public class Mensaje {
 	private final LocalDate fecha;
 	private int emoticono;
 	private TipoMensaje tipo;
-	private final Usuario emisor, receptor;
+	private final Usuario emisor;
+	private final Contacto receptor;
 	
-	public Mensaje(Usuario emisor, Usuario receptor, String texto, int emoticono, TipoMensaje tipo) {
+	public Mensaje(Usuario emisor, Contacto receptor, String texto, int emoticono, TipoMensaje tipo) {
 		this.emisor = emisor;
 		this.receptor = receptor;
 		this.texto = texto;
@@ -35,7 +36,7 @@ public class Mensaje {
 		return this.emisor;
 	}
 	
-	public Usuario getReceptor() {
+	public Contacto getReceptor() {
 		return this.receptor;
 	}
 	

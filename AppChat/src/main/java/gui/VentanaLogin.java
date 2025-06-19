@@ -37,7 +37,7 @@ public class VentanaLogin {
 	
 	private void initialize() {
 		frameLogin = new JFrame();
-		frameLogin.setTitle("AppChat");
+		frameLogin.setTitle("AppChat | Login");
 		frameLogin.setSize(LOGIN_HEIGHT, LOGIN_WIDTH);
 		frameLogin.setResizable(false);
 		frameLogin.setLocationByPlatform(true);
@@ -77,6 +77,7 @@ public class VentanaLogin {
 		panelCentralSup.add(telefono);
 		panelCentralInf.add(lblPssw);
 		panelCentralInf.add(password);
+	
 		
 		panelCentral.add(Box.createVerticalStrut(10));
 		panelCentral.add(panelCentralSup);
@@ -106,6 +107,13 @@ public class VentanaLogin {
 		        	JOptionPane.showMessageDialog(null, "Teléfono o clave incorrectos");
 		        }
 		        
+		    }
+		});
+		
+		password.addActionListener(new ActionListener() {
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		    	aceptar.doClick();
 		    }
 		});
 		

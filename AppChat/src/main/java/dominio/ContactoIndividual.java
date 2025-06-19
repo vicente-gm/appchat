@@ -31,4 +31,5 @@ public class ContactoIndividual extends Contacto {
     public String getImagen() {
 	    return this.usuario.getImagen();
     }
+    
 }

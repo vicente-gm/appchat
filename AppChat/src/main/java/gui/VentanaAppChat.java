@@ -7,6 +7,13 @@ import javax.swing.event.DocumentListener;
 import dominio.*;
 
 import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.stream.Collectors;
 
@@ -27,7 +34,7 @@ public class VentanaAppChat extends JDialog {
     public void initialize() {
         setTitle("AppChat");
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1200, 700);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
@@ -127,20 +134,65 @@ public class VentanaAppChat extends JDialog {
         });
         
         JButton nuevoContactoButton = new JButton("Crear contacto");
+        nuevoContactoButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	VentanaCrearContacto crearContacto = new VentanaCrearContacto(null);
+		    	
+		    	
+		    	crearContacto.addWindowListener(new WindowAdapter() {
+		            @Override
+		            public void windowClosed(WindowEvent e) {
+		            	actualizarVentana();
+		            }
+		        });
+
+		    	
+		    	crearContacto.setVisible(true);
+		    }
+        });
         panelSuperior.add(nuevoContactoButton);
 
         JButton nuevoGrupoButton = new JButton("Crear grupo");
+        nuevoGrupoButton.addActionListener(new ActionListener() {
+        	
+		    public void actionPerformed(ActionEvent e) {
+		    	VentanaCrearGrupo crearGrupo = new VentanaCrearGrupo();
+		    	
+		    	
+		    	crearGrupo.addWindowListener(new WindowAdapter() {
+		            @Override
+		            public void windowClosed(WindowEvent e) {
+		            	actualizarVentana();
+		            }
+		        });
+
+		    	crearGrupo.setVisible(true);
+		    }
+        });
         panelSuperior.add(nuevoGrupoButton);
+
+        JButton buscarMensajesButton = new JButton("Buscar mensajes");
+        buscarMensajesButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	VentanaBuscar ventanaBuscar = new VentanaBuscar();
+		    	ventanaBuscar.setVisible(true);
+		    }
+        });
         
-        JButton verContactosButton = new JButton("Ver contactos");
-        panelSuperior.add(verContactosButton);
+        panelSuperior.add(buscarMensajesButton);
         
         JButton premiumButton = new JButton("Premium");
         panelSuperior.add(premiumButton);
 
-        JButton buscarMensajesButton = new JButton("Buscar mensajes");
-        panelSuperior.add(buscarMensajesButton);
-
+        JButton logoutButton = new JButton("Cerrar sesión");
+        logoutButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	controlador.logout();
+		    	VentanaAppChat.this.dispose();
+		    	VentanaAppChat.this.ventanaPrevia.setVisible(true);
+		    }
+		});
+        panelSuperior.add(logoutButton);
 
         add(panelSuperior, BorderLayout.NORTH);
 
@@ -157,6 +209,20 @@ public class VentanaAppChat extends JDialog {
         	contactoPanel.setLayout(new BorderLayout());
             contactoPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
             contactoPanel.setMaximumSize(new Dimension(250, 100));
+            contactoPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            
+            // Cuando hacemos click, seleccionamos ese contacto
+            contactoPanel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+    		    	controlador.setContactoActual(c);
+    		    	actualizarVentana();
+    		    }    
+            });
+            
+            if (c.equals(controlador.getContactoActual())) {
+            	contactoPanel.setBorder(BorderFactory.createLineBorder(Color.magenta));
+            }
             
             String nombreContacto = c.getNombre();
             String telefonoContacto = null;
@@ -171,7 +237,7 @@ public class VentanaAppChat extends JDialog {
             	saludoContacto = ((ContactoIndividual) c).getSaludo();
             	fotoUsuario = ((ContactoIndividual) c).getImagen();
             } else {
-            	miembrosGrupo = ((Grupo) c).getMiembros().stream().map(Contacto::getNombre).collect(Collectors.joining("<br>"));
+            	miembrosGrupo = ((Grupo) c).getMiembros().stream().map(ContactoIndividual::getNombre).collect(Collectors.joining("<br>"));
             }
             
             // Nos aseguramos si el contacto está agregado
@@ -220,9 +286,30 @@ public class VentanaAppChat extends JDialog {
             panelNotificaciones.add(nuevosMensajesLabel, BorderLayout.EAST);
             panelNotificaciones.add(Box.createVerticalStrut(15));
             */
+            // Si el contacto es desconcido ponemos la opción de agregarlo
+            if (!agregado) {
+            	String telefono = telefonoContacto;
+            	
+	            JButton anadirContactoButton = new JButton(" + ");
+	            anadirContactoButton.addActionListener(new ActionListener() {
+	            	
+	    		    public void actionPerformed(ActionEvent e) {
+	    		    	VentanaCrearContacto crearContacto = new VentanaCrearContacto(telefono);
+	    		    	
+	    		    	
+	    		    	crearContacto.addWindowListener(new WindowAdapter() {
+	    		            @Override
+	    		            public void windowClosed(WindowEvent e) {
+	    		            	actualizarVentana();
+	    		            }
+	    		        });
 
-            JButton anadirContactoButton = new JButton(" + ");
-            panelNotificaciones.add(anadirContactoButton);
+	    		    	
+	    		    	crearContacto.setVisible(true);
+	    		    }
+	            });
+	            panelNotificaciones.add(anadirContactoButton);
+            }
             
             contactoPanel.add(panelNotificaciones, BorderLayout.EAST);
             
@@ -240,40 +327,126 @@ public class VentanaAppChat extends JDialog {
         // Panel de chat
         JPanel chatPanel = new JPanel(new BorderLayout());
 
-        JLabel chatConLabel = new JLabel("Mensajes con usuario1");
+        JLabel chatConLabel = new JLabel("Mensajes con " + controlador.getNombreContactoActual());
         chatConLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         chatPanel.add(chatConLabel, BorderLayout.NORTH);
 
         JPanel chat = new JPanel();
         chat.setLayout(new BoxLayout(chat,BoxLayout.Y_AXIS));
+        chat.setSize(new Dimension(925, 1));
 
-        chat.add(new BubbleText(chat, "Hola grupo!!", Color.GREEN, "J.Ramón", BubbleText.SENT));
-        chat.add(new BubbleText(chat, "Hola prueba", Color.LIGHT_GRAY, "J", BubbleText.RECEIVED));
-        chat.add(new BubbleText(chat, "Probando", Color.GREEN, "J.Ramón", BubbleText.SENT));
-        chat.add(new BubbleText(chat, "Test", Color.LIGHT_GRAY, "J", BubbleText.RECEIVED));
+        
+        for (Mensaje m : controlador.getMensajesContactoActual()) {
+        	int tipoMensaje = BubbleText.RECEIVED;
+        	Color colorMensaje = Color.LIGHT_GRAY;
+        	String nombreEmisor;
+        	
+        	if (m.getEmisor().getTelefono().equals(controlador.getTelefono())) { // Si el autor soy yo
+        		tipoMensaje = BubbleText.SENT;
+        		colorMensaje = Color.GREEN;
+        		nombreEmisor = "Yo";
+        	} else {
+        		nombreEmisor = controlador.getNombreContactoActual();
+        	}
+        	
+        	if (m.getEmoticono() == -1) {        		
+        		chat.add(new BubbleText(chat, m.getTexto(), colorMensaje, nombreEmisor, tipoMensaje, 16));
+        	} else {
+        		chat.add(new BubbleText(chat, m.getEmoticono(), colorMensaje, nombreEmisor, tipoMensaje, 16));
+        	}
+        }
+        
         chatPanel.add(chat, BorderLayout.CENTER);
 
+
         JScrollPane scrollMensajes = new JScrollPane(chat);
-        scrollMensajes.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollMensajes.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollMensajes.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        chatPanel.add(scrollMensajes, BorderLayout.CENTER);
+        SwingUtilities.invokeLater(() -> scrollMensajes.getVerticalScrollBar().setValue(scrollMensajes.getVerticalScrollBar().getMaximum()));
+        
+        chatPanel.add(scrollMensajes, BorderLayout.EAST);
+        
         
         JPanel panelEntrada = new JPanel(new BorderLayout());
+
+        
+    	// Botón emoticonos
+        JButton emojiButton = new JButton(BubbleText.getEmoji(0));
+        JPopupMenu emojiPopup = new JPopupMenu();
+        
+        JPanel emojiGrid = new JPanel(new GridLayout(0, 5, 5, 5));
+        emojiGrid.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+
+        for (int i = 0; i < BubbleText.MAXICONO; i++) {
+            JLabel emojiLabel = new JLabel();
+            emojiLabel.setIcon(BubbleText.getEmoji(i));
+            emojiLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            emojiLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+            final int index = i;
+            emojiLabel.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                	
+    		    	if (controlador.getContactoActual() instanceof ContactoIndividual) {
+    		    		controlador.enviarMensajeContacto((ContactoIndividual) controlador.getContactoActual(), "", index, TipoMensaje.ENVIADO);
+    		    	} else {
+    		    		controlador.enviarMensajeGrupo((Grupo) controlador.getContactoActual(), "", index, TipoMensaje.ENVIADO_GRUPO);
+    		    	}
+                    emojiPopup.setVisible(false); 
+    		    	actualizarVentana();
+
+                }
+            });
+
+            emojiGrid.add(emojiLabel);
+        }
+
+        emojiPopup.setLayout(new BorderLayout());
+        emojiPopup.add(emojiGrid, BorderLayout.CENTER);
+
+        emojiButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	emojiPopup.show(emojiButton, 0, emojiButton.getHeight());
+		    }
+        });
+
+        
+        panelEntrada.add(emojiButton, BorderLayout.WEST);
         
         // Configuración de la área de texto
         areaTexto = new JTextArea(1, 30); // Inicial con 1 línea
         areaTexto.setLineWrap(true);
         areaTexto.setWrapStyleWord(true);
-        areaTexto.setFont(new Font("Arial", Font.PLAIN, 14));
+        areaTexto.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+        areaTexto.setFont(new Font("Arial", Font.PLAIN, 16));
         // Hacer que el JTextArea crezca dinámicamente
         areaTexto.setPreferredSize(new Dimension(300, 30));
         areaTexto.getDocument().addDocumentListener(new DocumentListener() {
-        public void insertUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
-        public void removeUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
-        public void changedUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
+        	public void insertUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
+        	public void removeUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
+        	public void changedUpdate(DocumentEvent e) { ajustarTamañoAreaTexto(); }
         });
         
-        JButton botonEnviar = new JButton(new ImageIcon("icono_enviar.png")); // TODO poner icono
+        JButton botonEnviar = new JButton("Enviar"); 
+        botonEnviar.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	String mensaje = areaTexto.getText().trim();
+		    	
+		    	if (mensaje.isEmpty()) {
+		    		return;
+		    	}
+		    	
+		    	if (controlador.getContactoActual() instanceof ContactoIndividual) {
+		    		controlador.enviarMensajeContacto((ContactoIndividual) controlador.getContactoActual(), mensaje, -1, TipoMensaje.ENVIADO);
+		    	} else { // Si es un grupo enviamos el mensaje a todos los miembros
+		    		// Todo grupo
+		    		controlador.enviarMensajeGrupo((Grupo) controlador.getContactoActual(), mensaje, -1, TipoMensaje.ENVIADO_GRUPO);
+		    	}
+		    	
+		    	actualizarVentana();
+		    }
+        });
         
         panelEntrada.add(areaTexto, BorderLayout.CENTER);
         panelEntrada.add(botonEnviar, BorderLayout.EAST);
@@ -284,6 +457,13 @@ public class VentanaAppChat extends JDialog {
         add(chatPanel, BorderLayout.CENTER);
     }
 
+    private void actualizarVentana() {
+    	VentanaAppChat.this.getContentPane().removeAll();
+    	VentanaAppChat.this.initialize();
+    	VentanaAppChat.this.revalidate();
+    	VentanaAppChat.this.repaint();
+    }
+    
     private void ajustarTamañoAreaTexto() {
     	int lineas = areaTexto.getLineCount();
     	int altura = 20 * lineas; // Ajusta el valor según el tamaño de fuente
