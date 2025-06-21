@@ -2,6 +2,7 @@ package dominio;
 
 import java.awt.EventQueue;
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ public enum AppChat {
 	private MensajeDAO mensajeDAO;
 	private Usuario usuarioActual;
 	private Contacto contactoActual;
+	private List<Descuento> descuentos;
 	
 	
 	private AppChat() {
@@ -34,6 +36,10 @@ public enum AppChat {
 		contactoIndividualDAO = factoriaDAO.crearContactoIndividualDAO();
 		grupoDAO = factoriaDAO.crearGrupoDAO();
 		mensajeDAO = factoriaDAO.crearMensajeDAO();
+		
+		descuentos = new LinkedList<>();
+		descuentos.add(new DescuentoPorFecha());
+		descuentos.add(new DescuentoPorMensajes());
 	}
 	
 	public static void main(String[] args) {
@@ -51,7 +57,7 @@ public enum AppChat {
 	}
 	
 	public void registrarUsuario(String nombre, String apellidos, String telefono, String pass, String saludo, LocalDate fechaNacimiento, String rutaImagen) {
-		Usuario usuario = new Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, rutaImagen);
+		Usuario usuario = new Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, rutaImagen, LocalDate.now());
 		RepositorioUsuarios.INSTANCE.guardarUsuario(usuario);
 	}
 	public void eliminarUsuario(Usuario usuario) {
@@ -88,6 +94,10 @@ public enum AppChat {
 		if (usuarioLogin != null) {
 			if (usuarioLogin.getClave().equals(Utils.encriptarMD5(clave))) {
 				this.usuarioActual = usuarioLogin;
+				
+				// Comprobamos si ha caducado el Premium, que dura un año
+				LocalDate f = this.usuarioActual.getFechaPremium();
+				if(f != null && f.plusYears(1).isBefore(LocalDate.now())) actualizarPremium(false);
 				
 				// Establecemos el contacto nº1 como el contacto actual
 				if (!this.getContactos().isEmpty()) {					
@@ -201,6 +211,38 @@ public enum AppChat {
 			return null;
 		}
 		return this.contactoActual.getMensajes();
+	}
+	
+	public long getNumMensajesEnviadosUltMes() {
+		return this.usuarioActual.getContactos().stream()
+			    .flatMap(contacto -> contacto.getMensajes().stream())
+			    .filter(mensaje -> mensaje.getEmisor().equals(this.usuarioActual.getTelefono()))
+			    .filter(mensaje -> {
+			        LocalDate fecha = mensaje.getFechaEnvio();
+			        LocalDate ahora = LocalDate.now();
+			        LocalDate primerDiaMesPasado = ahora.minusMonths(1).withDayOfMonth(1);
+			        LocalDate ultimoDiaMesPasado = ahora.withDayOfMonth(1).minusDays(1);
+			        return !fecha.isBefore(primerDiaMesPasado) && !fecha.isAfter(ultimoDiaMesPasado);
+			    })
+			    .count();
+	}
+	
+	public double aplicarDescuentos() {
+		return descuentos.stream()
+			    .reduce(
+			        COSTE_PREMIUM,
+			        (precioActual, descuento) -> descuento.getDescuento(precioActual),
+			        (p1, p2) -> p1 // Este parámetro es un Combiner, pero no lo necesitamos
+			    );
+	}
+	
+	public void actualizarPremium(boolean act) {
+		if(act) this.usuarioActual.actualizaPremium();
+		else this.usuarioActual.caducarPremium();
+	}
+	
+	public boolean isPremium() {
+		return this.usuarioActual.isPremium();
 	}
 	
 	public void logout() {

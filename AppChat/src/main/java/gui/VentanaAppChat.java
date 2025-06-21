@@ -182,7 +182,73 @@ public class VentanaAppChat extends JDialog {
         panelSuperior.add(buscarMensajesButton);
         
         JButton premiumButton = new JButton("Premium");
-        panelSuperior.add(premiumButton);
+        if(!this.controlador.isPremium()) panelSuperior.add(premiumButton);
+        
+        premiumButton.addActionListener(e -> {
+            // Crear el diálogo
+            JDialog dialog = new JDialog((Frame) null, "Actualizar a Premium", true);
+            dialog.setSize(300, 250);
+            dialog.setLocationRelativeTo(null);
+            dialog.setLayout(new BorderLayout());
+
+            JPanel panelContenido = new JPanel(new BorderLayout(10, 10));
+            panelContenido.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            // Texto superior
+            JLabel mensajeLabel = new JLabel("¿Quiere actualizar su cuenta a Premium?");
+            mensajeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            panelContenido.add(mensajeLabel, BorderLayout.NORTH);
+
+            // Panel central con precio y botón de aplicar descuentos
+            JPanel panelCentro = new JPanel();
+            panelCentro.setLayout(new BoxLayout(panelCentro, BoxLayout.Y_AXIS));
+            JLabel precioLabel = new JLabel("Precio: $" + controlador.COSTE_PREMIUM);
+            precioLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton aplicarDescuentosBtn = new JButton("Aplicar descuentos");
+            aplicarDescuentosBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            aplicarDescuentosBtn.addActionListener(ev -> {
+                double nuevoPrecio = controlador.aplicarDescuentos(); // ← tu lógica
+                precioLabel.setText("Precio: $" + String.format("%.2f", nuevoPrecio));
+            });
+
+            panelCentro.add(Box.createVerticalStrut(10));
+            panelCentro.add(precioLabel);
+            panelCentro.add(Box.createVerticalStrut(10));
+            panelCentro.add(aplicarDescuentosBtn);
+
+            panelContenido.add(panelCentro, BorderLayout.CENTER);
+
+            // Panel inferior con botones Cancelar y Actualizar
+            JPanel panelInferior = new JPanel(new BorderLayout());
+
+            JButton cancelarBtn = new JButton("Cancelar");
+            cancelarBtn.addActionListener(ev -> dialog.dispose());
+
+            JButton actualizarBtn = new JButton("Actualizar");
+            actualizarBtn.addActionListener(ev -> {
+            	controlador.actualizarPremium(true);
+
+                dialog.dispose();
+
+                // Eliminamos el botón Premium
+                panelSuperior.remove(premiumButton);
+                panelSuperior.revalidate(); // actualizamos el layout
+                panelSuperior.repaint();    // repintamos el panel
+
+                JOptionPane.showMessageDialog(null, "¡Su cuenta ha sido actualizada correctamente!"); 
+            });
+
+            panelInferior.add(cancelarBtn, BorderLayout.WEST);
+            panelInferior.add(actualizarBtn, BorderLayout.EAST);
+
+            dialog.add(panelContenido, BorderLayout.CENTER);
+            dialog.add(panelInferior, BorderLayout.SOUTH);
+
+            dialog.setVisible(true);
+        });
+        
 
         JButton logoutButton = new JButton("Cerrar sesión");
         logoutButton.addActionListener(new ActionListener() {
