@@ -2,7 +2,7 @@ package dominio;
 
 import java.util.List;
 
-public class Contacto {
+public abstract class Contacto {
 	protected String nombre;
 	protected List<Mensaje> mensajes;
 	

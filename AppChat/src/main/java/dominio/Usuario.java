@@ -67,7 +67,7 @@ public class Usuario {
         return premium;
     }
     
-    public void actualizaPremium() {
+    public void actualizarPremium() {
     	this.premium = true;
     	this.fechaPremium = LocalDate.now();
     }
@@ -95,6 +95,11 @@ public class Usuario {
             }
         }
         return null;
+    }
+    
+    public boolean existeContacto(String nombre) {
+    	return this.contactos.stream()
+    			.anyMatch(c -> c.getNombre().equals(nombre));
     }
     
     public void addContacto(Contacto contacto) {

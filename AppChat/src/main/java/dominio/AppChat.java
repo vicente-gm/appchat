@@ -2,6 +2,8 @@ package dominio;
 
 import java.awt.EventQueue;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +24,7 @@ public enum AppChat {
 	private Usuario usuarioActual;
 	private Contacto contactoActual;
 	private List<Descuento> descuentos;
+	private ExportPDF generadorPDF;
 	
 	
 	private AppChat() {
@@ -36,6 +39,8 @@ public enum AppChat {
 		contactoIndividualDAO = factoriaDAO.crearContactoIndividualDAO();
 		grupoDAO = factoriaDAO.crearGrupoDAO();
 		mensajeDAO = factoriaDAO.crearMensajeDAO();
+		
+		this.generadorPDF = new ExportPDF();
 		
 		descuentos = new LinkedList<>();
 		descuentos.add(new DescuentoPorFecha());
@@ -237,12 +242,38 @@ public enum AppChat {
 	}
 	
 	public void actualizarPremium(boolean act) {
-		if(act) this.usuarioActual.actualizaPremium();
+		if(act) this.usuarioActual.actualizarPremium();
 		else this.usuarioActual.caducarPremium();
 	}
 	
 	public boolean isPremium() {
 		return this.usuarioActual.isPremium();
+	}
+	
+	public boolean existeContacto(String contacto) {
+		return this.usuarioActual.existeContacto(contacto);
+	}
+	
+	public boolean crearPDF(String ruta, String contacto) {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fecha = LocalDate.now().format(formato);
+        
+		return this.generadorPDF.crearPDF(ruta + "mensajes-" + contacto + "-" + fecha, contacto);
+	}
+	
+	public List<Mensaje> getMensajesContacto(String contacto) {
+	    return this.usuarioActual.getContactos().stream()
+	            .filter(c -> c.getNombre().equals(contacto))
+	            .findFirst()
+	            .map(Contacto::getMensajes)
+	            .orElse(Collections.emptyList());
+	}
+	
+	public Contacto getContacto(String nombre) {
+		return this.usuarioActual.getContactos().stream()
+				.filter(c -> c.getNombre().equals(nombre))
+				.findFirst()
+				.orElse(null);
 	}
 	
 	public void logout() {
