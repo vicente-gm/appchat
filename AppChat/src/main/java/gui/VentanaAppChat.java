@@ -158,7 +158,6 @@ public class VentanaAppChat extends JDialog {
 		    public void actionPerformed(ActionEvent e) {
 		    	VentanaCrearGrupo crearGrupo = new VentanaCrearGrupo();
 		    	
-		    	
 		    	crearGrupo.addWindowListener(new WindowAdapter() {
 		            @Override
 		            public void windowClosed(WindowEvent e) {
@@ -178,11 +177,152 @@ public class VentanaAppChat extends JDialog {
 		    	ventanaBuscar.setVisible(true);
 		    }
         });
-        
         panelSuperior.add(buscarMensajesButton);
         
+        JButton pdfButton = new JButton("Generar PDF");
+        if(this.controlador.isPremium()) panelSuperior.add(pdfButton);
+
+        pdfButton.addActionListener(e -> {
+            // Crear el diálogo
+            JDialog dialog = new JDialog((Frame) null, "Generar PDF", true);
+            dialog.setSize(500, 200);
+            dialog.setLocationRelativeTo(null);
+
+            // Panel principal con GridLayout de 3 filas y 2 columnas
+            JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+            panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            // Fila 1: Label + Campo de texto
+            JLabel contactoLabel = new JLabel("Nombre de contacto o grupo para imprimir mensajes:");
+            JTextField contactoField = new JTextField();
+
+            // Fila 2: Label + Selector de directorio
+            JLabel rutaLabel = new JLabel("Ruta donde guardar el archivo:");
+            JTextField rutaField = new JTextField();
+            rutaField.setEditable(false);
+            JButton seleccionarRutaBtn = new JButton("Seleccionar carpeta");
+
+            seleccionarRutaBtn.addActionListener(ev -> {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int opcion = chooser.showOpenDialog(dialog);
+                if (opcion == JFileChooser.APPROVE_OPTION) {
+                    rutaField.setText(chooser.getSelectedFile().getAbsolutePath());
+                }
+            });
+
+            // Añadir la segunda fila como subpanel (label + botón + ruta)
+            JPanel rutaPanel = new JPanel(new BorderLayout(5, 5));
+            rutaPanel.add(rutaField, BorderLayout.CENTER);
+            rutaPanel.add(seleccionarRutaBtn, BorderLayout.EAST);
+
+            // Fila 3: Botones Cancelar y Aceptar
+            JButton cancelarBtn = new JButton("Cancelar");
+            cancelarBtn.addActionListener(ev -> dialog.dispose());
+
+            JButton aceptarBtn = new JButton("Aceptar");
+            aceptarBtn.addActionListener(ev -> {
+                String contacto = contactoField.getText().trim();
+                String ruta = rutaField.getText().trim();
+
+                if (contacto.isEmpty() || ruta.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "Debe completar ambos campos correctamente.", "Error", JOptionPane.ERROR_MESSAGE);
+                } if(!this.controlador.existeContacto(contacto)) { 
+                	JOptionPane.showMessageDialog(dialog, "El nombre del contacto o grupo introducido debe existir.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                
+            	boolean res = this.controlador.crearPDF(ruta, contacto);
+            	
+            	if(!res) JOptionPane.showMessageDialog(dialog, "Error al generar el archivo PDF.", "Error", JOptionPane.ERROR_MESSAGE);
+            	else dialog.dispose();    
+            });
+
+            JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            botonesPanel.add(cancelarBtn);
+            botonesPanel.add(aceptarBtn);
+
+            // Añadir componentes al panel
+            panel.add(contactoLabel);
+            panel.add(contactoField);
+            panel.add(rutaLabel);
+            panel.add(rutaPanel);
+            panel.add(new JLabel()); // celda vacía para alinear
+            panel.add(botonesPanel);
+
+            dialog.setContentPane(panel);
+            dialog.setVisible(true);
+        });
+        
         JButton premiumButton = new JButton("Premium");
-        panelSuperior.add(premiumButton);
+        if(!this.controlador.isPremium()) panelSuperior.add(premiumButton);
+        
+        premiumButton.addActionListener(e -> {
+            // Crear el diálogo
+            JDialog dialog = new JDialog((Frame) null, "Actualizar a Premium", true);
+            dialog.setSize(300, 250);
+            dialog.setLocationRelativeTo(null);
+            dialog.setLayout(new BorderLayout());
+
+            JPanel panelContenido = new JPanel(new BorderLayout(10, 10));
+            panelContenido.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            // Texto superior
+            JLabel mensajeLabel = new JLabel("¿Quiere actualizar su cuenta a Premium?");
+            mensajeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            panelContenido.add(mensajeLabel, BorderLayout.NORTH);
+
+            // Panel central con precio y botón de aplicar descuentos
+            JPanel panelCentro = new JPanel();
+            panelCentro.setLayout(new BoxLayout(panelCentro, BoxLayout.Y_AXIS));
+            JLabel precioLabel = new JLabel("Precio: $" + controlador.COSTE_PREMIUM);
+            precioLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton aplicarDescuentosBtn = new JButton("Aplicar descuentos");
+            aplicarDescuentosBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            aplicarDescuentosBtn.addActionListener(ev -> {
+                double nuevoPrecio = controlador.aplicarDescuentos(); // ← tu lógica
+                precioLabel.setText("Precio: $" + String.format("%.2f", nuevoPrecio));
+            });
+
+            panelCentro.add(Box.createVerticalStrut(10));
+            panelCentro.add(precioLabel);
+            panelCentro.add(Box.createVerticalStrut(10));
+            panelCentro.add(aplicarDescuentosBtn);
+
+            panelContenido.add(panelCentro, BorderLayout.CENTER);
+
+            // Panel inferior con botones Cancelar y Actualizar
+            JPanel panelInferior = new JPanel(new BorderLayout());
+
+            JButton cancelarBtn = new JButton("Cancelar");
+            cancelarBtn.addActionListener(ev -> dialog.dispose());
+
+            JButton actualizarBtn = new JButton("Actualizar");
+            actualizarBtn.addActionListener(ev -> {
+            	controlador.actualizarPremium(true);
+
+                dialog.dispose();
+
+                
+                panelSuperior.remove(premiumButton);	// Eliminamos el botón Premium
+                panelSuperior.add(pdfButton);	// Añadimos el botón de generar PDF
+                
+                // Actualizamos
+                panelSuperior.revalidate();
+                panelSuperior.repaint();
+
+                JOptionPane.showMessageDialog(null, "¡Su cuenta ha sido actualizada correctamente!"); 
+            });
+
+            panelInferior.add(cancelarBtn, BorderLayout.WEST);
+            panelInferior.add(actualizarBtn, BorderLayout.EAST);
+
+            dialog.add(panelContenido, BorderLayout.CENTER);
+            dialog.add(panelInferior, BorderLayout.SOUTH);
+
+            dialog.setVisible(true);
+        });   
 
         JButton logoutButton = new JButton("Cerrar sesión");
         logoutButton.addActionListener(new ActionListener() {
