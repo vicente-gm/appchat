@@ -5,13 +5,14 @@ import java.time.LocalDate;
 
 public class Mensaje {
 	private String texto;
-	private final LocalDate fecha;
+	private LocalDate fecha;
 	private int emoticono;
 	private TipoMensaje tipo;
-	private final Usuario emisor;
-	private final Contacto receptor;
+	private final String emisor;
+	private final String receptor;
+	private int id;
 	
-	public Mensaje(Usuario emisor, Contacto receptor, String texto, int emoticono, TipoMensaje tipo) {
+	public Mensaje(String emisor, String receptor, String texto, int emoticono, TipoMensaje tipo) {
 		this.emisor = emisor;
 		this.receptor = receptor;
 		this.texto = texto;
@@ -19,6 +20,14 @@ public class Mensaje {
 		this.emoticono = emoticono;
 		this.tipo = tipo;
 	}
+	
+	public int getId() {
+    	return this.id;
+    }
+	
+	public void setId(int _id) {
+    	this.id = _id;
+    }
 	
 	public String getTexto() {
 		return this.texto;
@@ -32,11 +41,11 @@ public class Mensaje {
 		return this.tipo;
 	}
 	
-	public Usuario getEmisor() {
+	public String getEmisor() {
 		return this.emisor;
 	}
 	
-	public Contacto getReceptor() {
+	public String getReceptor() {
 		return this.receptor;
 	}
 	
@@ -50,5 +59,9 @@ public class Mensaje {
 	
 	public String getDia() {
 		return new SimpleDateFormat("dd/MM/yyyy").format(this.fecha);
+	}
+	
+	public void setFecha(LocalDate f) {
+		this.fecha = f;
 	}
 }

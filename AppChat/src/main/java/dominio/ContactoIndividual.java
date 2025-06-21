@@ -1,6 +1,7 @@
 package dominio;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ContactoIndividual extends Contacto {
 	
@@ -12,6 +13,7 @@ public class ContactoIndividual extends Contacto {
 	}
 	
 	public ContactoIndividual(Usuario usuario) {
+		super();
 		this.usuario = usuario;
 		this.mensajes = new ArrayList<Mensaje>();  
 	}
@@ -32,4 +34,7 @@ public class ContactoIndividual extends Contacto {
 	    return this.usuario.getImagen();
     }
     
+    public void setMensajes(List<Mensaje> m) {
+    	this.mensajes = m;
+    }
 }

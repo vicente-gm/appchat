@@ -481,7 +481,7 @@ public class VentanaAppChat extends JDialog {
         	Color colorMensaje = Color.LIGHT_GRAY;
         	String nombreEmisor;
         	
-        	if (m.getEmisor().getTelefono().equals(controlador.getTelefono())) { // Si el autor soy yo
+        	if (m.getEmisor().equals(controlador.getTelefono())) { // Si el autor soy yo
         		tipoMensaje = BubbleText.SENT;
         		colorMensaje = Color.GREEN;
         		nombreEmisor = "Yo";
