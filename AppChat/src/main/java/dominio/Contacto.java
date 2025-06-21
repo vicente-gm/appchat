@@ -5,6 +5,7 @@ import java.util.List;
 public abstract class Contacto {
 	protected String nombre;
 	protected List<Mensaje> mensajes;
+	private int id;
 	
 	public String getNombre() {
 		return this.nombre;
@@ -21,4 +22,12 @@ public abstract class Contacto {
 	public void addMensaje(Mensaje mensaje) {
 		this.mensajes.add(mensaje);
 	}
+	
+	public int getId() {
+		return this.id;
+	}
+	
+	public void setId(int _id) {
+    	this.id = _id;
+    }
 }

@@ -26,7 +26,6 @@ public enum AppChat {
 	private List<Descuento> descuentos;
 	private ExportPDF generadorPDF;
 	
-	
 	private AppChat() {
 		
 		try {
@@ -140,11 +139,11 @@ public enum AppChat {
 	}
 	
 	public void enviarMensajeContacto(ContactoIndividual contacto, String texto, int emoticono, TipoMensaje tipo) {
-		Mensaje mensaje = new Mensaje(this.usuarioActual, contacto, texto, emoticono, tipo);
+		Mensaje mensaje = new Mensaje(this.usuarioActual.getTelefono(), contacto.getTelefono(), texto, emoticono, tipo);
 		
 		contacto.addMensaje(mensaje);
 		
-		Mensaje mensajeRecibido = new Mensaje(this.usuarioActual, contacto, texto, emoticono, TipoMensaje.RECIBIDO);
+		Mensaje mensajeRecibido = new Mensaje(this.usuarioActual.getTelefono(), contacto.getTelefono(), texto, emoticono, TipoMensaje.RECIBIDO);
 
 		// Si el recibidor no nos tiene agregados, crearemos un nuevo contacto con nombre null
 		ContactoIndividual contactoEnRecibidor = contacto.getUsuario().buscarContactoIndividual(this.usuarioActual.getTelefono());
@@ -167,7 +166,7 @@ public enum AppChat {
 	}
 	
 	public void enviarMensajeGrupo(Grupo grupo, String texto, int emoticono, TipoMensaje tipo) {
-		Mensaje mensaje = new Mensaje(this.usuarioActual, grupo, texto, emoticono, tipo);
+		Mensaje mensaje = new Mensaje(this.usuarioActual.getTelefono(), grupo.getNombre(), texto, emoticono, tipo);
 		grupo.addMensaje(mensaje);
 		
 		for (ContactoIndividual c : grupo.getMiembros()) {

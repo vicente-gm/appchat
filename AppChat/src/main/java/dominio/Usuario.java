@@ -13,6 +13,7 @@ public class Usuario {
 	private String imagen;
 	private boolean premium;
 	private LocalDate fechaPremium;
+	private int id;
 	
 	private List<Contacto> contactos; 
 	
@@ -29,6 +30,18 @@ public class Usuario {
         this.fechaPremium = null;
         
         this.contactos = new ArrayList<Contacto>();
+    }
+    
+    public void setContactos(List<Contacto> cont) {
+    	this.contactos = cont;
+    }
+    
+    public int getId() {
+    	return this.id;
+    }
+    
+    public void setId(int _id) {
+    	this.id = _id;
     }
     
     public String getNombre() {
@@ -67,6 +80,10 @@ public class Usuario {
         return premium;
     }
     
+    public void setPremium(boolean p) {
+    	this.premium = p;
+    }
+    
     public void actualizarPremium() {
     	this.premium = true;
     	this.fechaPremium = LocalDate.now();
@@ -74,6 +91,10 @@ public class Usuario {
     
     public void caducarPremium() {
     	this.premium = false;
+    }
+    
+    public void setFechaPremium(LocalDate f) {
+    	this.fechaPremium = f;
     }
     
     public LocalDate getFechaPremium() {

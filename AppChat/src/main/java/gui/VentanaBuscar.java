@@ -101,9 +101,9 @@ public class VentanaBuscar extends JDialog {
 	        mensaje.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 	        String emisor;
-	        String emisorTelefono = m.getEmisor().getTelefono();
+	        String emisorTelefono = m.getEmisor();
 	        String receptor;
-	        String receptorTelefono = ((ContactoIndividual) m.getReceptor()).getTelefono();
+	        String receptorTelefono = m.getReceptor();
 
 	        
 	        if (emisorTelefono.equals(controlador.getTelefono())) {
