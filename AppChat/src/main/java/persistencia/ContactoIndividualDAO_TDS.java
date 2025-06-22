@@ -40,9 +40,9 @@ public class ContactoIndividualDAO_TDS implements ContactoIndividualDAO {
 			eIndividual = servicioPersistencia.recuperarEntidad(contacto.getId());
 			
 			if (eIndividual != null) {
-		        throw new IllegalStateException("Error: el contacto ya existe en el sistema.");
+		        throw new Exception("Error: el contacto ya existe en el sistema.");
 		    }
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			eIndividual = null;
 		}
 		eIndividual = servicioPersistencia.registrarEntidad(IndividualToEntidad(contacto)) ;
@@ -67,15 +67,24 @@ public class ContactoIndividualDAO_TDS implements ContactoIndividualDAO {
 				prop.setValor(obtenerIDsMensajes(contacto.getMensajes()));
 			}
 			
-			servicioPersistencia.modificarPropiedad(prop);
+			servicioPersistencia.modificarPropiedad(prop);	
+		}
+		if (PoolDAO.getInstance().contains(contacto.getId())) {
+			PoolDAO.getInstance().changeObject(contacto.getId(), contacto);
 		}
     }
 
     @Override
     public ContactoIndividual recuperarContactoIndividual(int id) {
+		if (PoolDAO.getInstance().contains(id)) {
+			return (ContactoIndividual) PoolDAO.getInstance().getObject(id);
+		}
+    	
     	Entidad eIndividual = servicioPersistencia.recuperarEntidad(id);
         if(eIndividual==null) return null;
         ContactoIndividual c = entidadToIndividual(eIndividual);
+        
+		PoolDAO.getInstance().addObject(id, c);
 
         return c;
     }

@@ -75,9 +75,9 @@ public class MensajeDAO_TDS implements MensajeDAO {
 			eMensaje = servicioPersistencia.recuperarEntidad(mensaje.getId());
 			
 			if (eMensaje != null) {
-		        throw new IllegalStateException("Error: el mensaje ya existe en el sistema.");
+		        throw new Exception("Error: el mensaje ya existe.");
 		    }
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			eMensaje = null;
 		}
 
@@ -113,14 +113,23 @@ public class MensajeDAO_TDS implements MensajeDAO {
 			
 			servicioPersistencia.modificarPropiedad(prop);
 		}
+		if (PoolDAO.getInstance().contains(mensaje.getId())) {
+			PoolDAO.getInstance().changeObject(mensaje.getId(), mensaje);
+		}
     }
 
     @Override
     public Mensaje recuperarMensaje(int id) {
+		if (PoolDAO.getInstance().contains(id)) {
+			return (Mensaje) PoolDAO.getInstance().getObject(id);
+		}
+    	
     	Entidad eMensaje = servicioPersistencia.recuperarEntidad(id);
         if(eMensaje==null) return null;
         Mensaje m = entidadToMensaje(eMensaje);
-        
+		
+        PoolDAO.getInstance().addObject(id, m);
+		
         return m;
     }
 

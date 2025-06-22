@@ -16,14 +16,14 @@ import dominio.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 
+
 public class UsuarioDAO_TDS implements UsuarioDAO {
-	
+
 	private ServicioPersistencia servicioPersistencia;
 	private static UsuarioDAO_TDS instancia = null;
 	
 	public static UsuarioDAO_TDS getInstancia() {
 		if(instancia == null) instancia = new UsuarioDAO_TDS();
-		
 		return instancia;
 	}
 	
@@ -37,11 +37,11 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
    		
    		try {
    			eUsuario = this.servicioPersistencia.recuperarEntidad(usuario.getId());
-   		
+   			
    			if (eUsuario != null) {
-		        throw new IllegalStateException("Error: el usuario ya existe en el sistema.");
+		        throw new Exception("Error: el usuario ya existe.");
 		    }
-   		} catch (NullPointerException e) {
+   		} catch (Exception e) {
 			eUsuario = null;
 		}
    		
@@ -55,7 +55,12 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
    						new Propiedad("Premium", String.valueOf(usuario.isPremium())),
    						new Propiedad("Nacimiento", usuario.getFechaNacimiento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))),
    						new Propiedad("Registro", usuario.getFechaRegistro().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))),
-   						new Propiedad("FechaPremium", usuario.getFechaPremium().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))),
+   						new Propiedad(
+   							    "FechaPremium",
+   							    usuario.getFechaPremium() != null 
+   							        ? usuario.getFechaPremium().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) 
+   							        : "Null"
+   						),
    						new Propiedad("Saludo", usuario.getSaludo()),
    						new Propiedad("RutaImagen", usuario.getImagen()),
    						new Propiedad("Contactos", obtenerCodigosContactos(usuario.getContactos()))
@@ -89,7 +94,14 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
 			} else if (prop.getNombre().equals("Registro")) {
 				prop.setValor(usuario.getFechaRegistro().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 			} else if (prop.getNombre().equals("FechaPremium")) {
-				prop.setValor(usuario.getFechaPremium().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+			    if (!prop.getValor().equals("Null")) {
+			        usuario.setFechaPremium(LocalDate.parse(
+			            prop.getValor(), 
+			            DateTimeFormatter.ofPattern("dd/MM/yyyy")
+			        ));
+			    } else {
+			        usuario.setFechaPremium(null);
+			    }
 			} else if (prop.getNombre().equals("Saludo")) {
 				prop.setValor(usuario.getSaludo());
 			} else if (prop.getNombre().equals("RutaImagen")) {
@@ -100,10 +112,17 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
 
 			servicioPersistencia.modificarPropiedad(prop);
 		}
+		if (PoolDAO.getInstance().contains(usuario.getId())) {
+			PoolDAO.getInstance().changeObject(usuario.getId(), usuario);
+		}
     }
 
     @Override
     public Usuario recuperarUsuario(int id) {
+		if (PoolDAO.getInstance().contains(id)) {
+			return (Usuario) PoolDAO.getInstance().getObject(id);
+		}
+    	
     	Entidad eUsuario = servicioPersistencia.recuperarEntidad(id);
 		if (eUsuario == null) return null;
 		String nombre = servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Nombre");
@@ -120,6 +139,8 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
 		Usuario usuario = new Usuario(nombre, apellido, telefono, password,  saludo, nacimiento, urlImagen, registro);
 		usuario.setPremium(premium);
 		usuario.setFechaPremium(fechaPremium);
+		
+		PoolDAO.getInstance().addObject(id, usuario);
 		
 		List<Contacto> contactos = obtenerContactosDesdeIDs(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
 		usuario.setId(id);
@@ -145,7 +166,7 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
     private List<Contacto> obtenerContactosDesdeIDs(String idsContactos){
 		List<Contacto> contactos = new LinkedList<Contacto>();
 		StringTokenizer strTok = new StringTokenizer(idsContactos, " ");
-		while ( strTok.hasMoreElements()) { //problema con esto dado que no se que tipo de contacto es
+		while ( strTok.hasMoreElements()) {
 			int id = Integer.parseInt((String) strTok.nextElement());
 			Entidad eContacto = servicioPersistencia.recuperarEntidad(id);
 	        String tipo = eContacto.getNombre();

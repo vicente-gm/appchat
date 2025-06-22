@@ -12,6 +12,7 @@ import beans.Propiedad;
 import dominio.ContactoIndividual;
 import dominio.Grupo;
 import dominio.Mensaje;
+import dominio.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 
@@ -40,9 +41,9 @@ public class GrupoDAO_TDS implements GrupoDAO {
 			eGrupo = servicioPersistencia.recuperarEntidad(grupo.getId());
 			
 			if (eGrupo != null) {
-		        throw new IllegalStateException("Error: el grupo ya existe en el sistema.");
+		        throw new Exception("Error: el grupo ya existe");
 		    }
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			eGrupo = null;
 		}
 		
@@ -69,14 +70,23 @@ public class GrupoDAO_TDS implements GrupoDAO {
 			}
 			
 			servicioPersistencia.modificarPropiedad(prop);
+			if (PoolDAO.getInstance().contains(grupo.getId())) {
+				PoolDAO.getInstance().changeObject(grupo.getId(), grupo);
+			}
 		}
     }
 
     @Override
     public Grupo recuperarGrupo(int id) {
+		if (PoolDAO.getInstance().contains(id)) {
+			return (Grupo) PoolDAO.getInstance().getObject(id);
+		}
+    	
     	Entidad eGrupo = servicioPersistencia.recuperarEntidad(id);
 		if(eGrupo == null) return null;
 		Grupo grupo = entidadToGrupo(eGrupo);
+		
+		PoolDAO.getInstance().addObject(id, grupo);
 		
 		return grupo;    }
 
