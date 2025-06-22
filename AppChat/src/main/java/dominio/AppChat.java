@@ -46,20 +46,6 @@ public enum AppChat {
 		descuentos.add(new DescuentoPorMensajes());
 	}
 	
-	public static void main(String[] args) {
-		CargarAppChat.cargar();
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaLogin login = new VentanaLogin();
-					login.show();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
 	public void registrarUsuario(String nombre, String apellidos, String telefono, String pass, String saludo, LocalDate fechaNacimiento, String rutaImagen) {
 		Usuario usuario = new Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, rutaImagen, LocalDate.now());
 		RepositorioUsuarios.INSTANCE.guardarUsuario(usuario);
