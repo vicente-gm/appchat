@@ -138,7 +138,6 @@ public class VentanaAppChat extends JDialog {
 		    public void actionPerformed(ActionEvent e) {
 		    	VentanaCrearContacto crearContacto = new VentanaCrearContacto(null);
 		    	
-		    	
 		    	crearContacto.addWindowListener(new WindowAdapter() {
 		            @Override
 		            public void windowClosed(WindowEvent e) {

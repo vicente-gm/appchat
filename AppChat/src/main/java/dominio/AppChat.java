@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import gui.VentanaLogin;
 import persistencia.*;
 
 
@@ -27,9 +26,9 @@ public enum AppChat {
 	private ExportPDF generadorPDF;
 	
 	private AppChat() {
-		
 		try {
 			factoriaDAO = FactoriaDAO.getInstancia(DAO_TDS);
+			RepositorioUsuarios.INSTANCE.cargarUsuarios();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -49,10 +48,14 @@ public enum AppChat {
 	public void registrarUsuario(String nombre, String apellidos, String telefono, String pass, String saludo, LocalDate fechaNacimiento, String rutaImagen) {
 		Usuario usuario = new Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, rutaImagen, LocalDate.now());
 		RepositorioUsuarios.INSTANCE.guardarUsuario(usuario);
+		this.usuarioDAO.registrarUsuarios(usuario);
 	}
+	
 	public void eliminarUsuario(Usuario usuario) {
 		RepositorioUsuarios.INSTANCE.eliminarUsuario(usuario);
+		this.usuarioDAO.borrarUsuarios(usuario);
 	}
+	
 	public Usuario buscarUsuario(String telefono) {
 		return RepositorioUsuarios.INSTANCE.buscarUsuarioPorTelefono(telefono); 
 	}
@@ -68,6 +71,7 @@ public enum AppChat {
 			if (existeContacto == null) { // Comprobamos si no existe ya en la lista de contactos (aunque no esté agregado)
 				ContactoIndividual contacto = new ContactoIndividual(usuario, nombre);
 				this.usuarioActual.addContacto(contacto);
+				this.contactoIndividualDAO.registrarContactoIndividual(contacto);
 				return contacto;
 			} else {
 				// Si existe solo le cambiamos el nombre al nuevo elegido
@@ -106,6 +110,7 @@ public enum AppChat {
 	
 	public void cambiarImagen(String img) {
 		this.usuarioActual.setImagen(img);
+		this.usuarioDAO.modificarUsuario(usuarioActual);
 	}
 	
 	public String getSaludo() {
@@ -118,6 +123,7 @@ public enum AppChat {
 	
 	public void cambiarSaludo(String msg) {
 		this.usuarioActual.setSaludo(msg);
+		this.usuarioDAO.modificarUsuario(usuarioActual);
 	}
 
 	public Usuario getUsuarioActual() {
@@ -128,6 +134,7 @@ public enum AppChat {
 		Mensaje mensaje = new Mensaje(this.usuarioActual.getTelefono(), contacto.getTelefono(), texto, emoticono, tipo);
 		
 		contacto.addMensaje(mensaje);
+		this.mensajeDAO.registrarMensaje(mensaje);
 		
 		Mensaje mensajeRecibido = new Mensaje(this.usuarioActual.getTelefono(), contacto.getTelefono(), texto, emoticono, TipoMensaje.RECIBIDO);
 
@@ -136,9 +143,12 @@ public enum AppChat {
 		if (contactoEnRecibidor == null) {
 			ContactoIndividual nuevoContactoSinAgregar = new ContactoIndividual(this.usuarioActual);
 			nuevoContactoSinAgregar.addMensaje(mensajeRecibido);
+			this.mensajeDAO.registrarMensaje(mensaje);
 			contacto.getUsuario().addContacto(nuevoContactoSinAgregar);
+			this.contactoIndividualDAO.registrarContactoIndividual(nuevoContactoSinAgregar);
 		} else {
 			contactoEnRecibidor.addMensaje(mensajeRecibido);
+			this.mensajeDAO.registrarMensaje(mensaje);
 		}
 	}
 	
@@ -149,11 +159,13 @@ public enum AppChat {
 	public void crearGrupo(String nombreGrupo, List<ContactoIndividual> miembros) {
 		Grupo nuevoGrupo = new Grupo(miembros, nombreGrupo);
 		this.usuarioActual.addContacto(nuevoGrupo);
+		this.grupoDAO.registrarGrupo(nuevoGrupo);
 	}
 	
 	public void enviarMensajeGrupo(Grupo grupo, String texto, int emoticono, TipoMensaje tipo) {
 		Mensaje mensaje = new Mensaje(this.usuarioActual.getTelefono(), grupo.getNombre(), texto, emoticono, tipo);
 		grupo.addMensaje(mensaje);
+		this.mensajeDAO.registrarMensaje(mensaje);	// Se envía el mensaje al grupo y a cada contacto
 		
 		for (ContactoIndividual c : grupo.getMiembros()) {
 			enviarMensajeContacto(c, texto, emoticono, tipo);
@@ -229,6 +241,7 @@ public enum AppChat {
 	public void actualizarPremium(boolean act) {
 		if(act) this.usuarioActual.actualizarPremium();
 		else this.usuarioActual.caducarPremium();
+		this.usuarioDAO.modificarUsuario(usuarioActual);
 	}
 	
 	public boolean isPremium() {

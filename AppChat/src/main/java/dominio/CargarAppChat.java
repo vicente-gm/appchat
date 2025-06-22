@@ -13,6 +13,8 @@ public class CargarAppChat {
 		appChat.registrarUsuario("Diego", "Belmonte", "44", "44", "Hola, soy Diego", LocalDate.of(1970, 5, 11), "/usuarios/user.jpeg");
 		appChat.registrarUsuario("Anne", "Smith", "55", "55", "Hola, soy Anne", LocalDate.of(1990, 3, 28), "/usuarios/user.jpeg");
 		
+		appChat.login("11", "11");
+		
 		ContactoIndividual c2 = appChat.agregarContacto("Elena", "22");
 		ContactoIndividual c3 = appChat.agregarContacto("Rosalía", "33");
 		
@@ -21,14 +23,8 @@ public class CargarAppChat {
 		
 		appChat.enviarMensajeContacto(c3, "Cuando cantas?", -1, TipoMensaje.ENVIADO);
 		appChat.enviarMensajeContacto(c2, "", 6, TipoMensaje.ENVIADO);
-				
-		ContactoIndividual c1 = RepositorioUsuarios.INSTANCE.buscarUsuarioPorTelefono("22").buscarContactoIndividual("11");
-		ContactoIndividual c4 = appChat.agregarContacto("diego", "44");
-		ContactoIndividual c5 = appChat.agregarContacto("anne", "55");
 		
-		appChat.enviarMensajeContacto(c1, "Vienes este finde?", -1, TipoMensaje.ENVIADO);
-		appChat.enviarMensajeContacto(c1, "", 3, TipoMensaje.ENVIADO);
-	    appChat.enviarMensajeContacto(c4, "Juegas esta semana?", -1, TipoMensaje.ENVIADO);	
+		appChat.logout();	
 	    
 	    System.out.println("Fin de la carga de datos");
 	}
