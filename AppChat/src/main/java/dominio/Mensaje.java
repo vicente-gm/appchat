@@ -2,10 +2,11 @@ package dominio;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Mensaje {
 	private String texto;
-	private LocalDate fecha;
+	private LocalDateTime fecha;
 	private int emoticono;
 	private TipoMensaje tipo;
 	private final String emisor;
@@ -16,7 +17,7 @@ public class Mensaje {
 		this.emisor = emisor;
 		this.receptor = receptor;
 		this.texto = texto;
-		this.fecha = LocalDate.now(); // Devuelve un objeto Date con la fecha y hora actual
+		this.fecha = LocalDateTime.now(); // Devuelve un objeto Date con la fecha y hora actual
 		this.emoticono = emoticono;
 		this.tipo = tipo;
 	}
@@ -49,7 +50,7 @@ public class Mensaje {
 		return this.receptor;
 	}
 	
-	public LocalDate getFechaEnvio() {
+	public LocalDateTime getFechaEnvio() {
 		return this.fecha;
 	}
 	
@@ -61,7 +62,7 @@ public class Mensaje {
 		return new SimpleDateFormat("dd/MM/yyyy").format(this.fecha);
 	}
 	
-	public void setFecha(LocalDate f) {
+	public void setFecha(LocalDateTime f) {
 		this.fecha = f;
 	}
 }

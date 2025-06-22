@@ -17,6 +17,14 @@ public class Usuario {
 	
 	private List<Contacto> contactos; 
 	
+	// El constructor se usará con el campo encriptar=false cuando se quiera pasar su clave directamente ya hasheada en MD5, saltandose este paso
+	public Usuario(String nombre, String apellidos, String telefono, String clave, String saludo, LocalDate fechaNacimiento, String imagen, LocalDate fechaReg, boolean encriptar) {
+		this(nombre, apellidos, telefono, clave, saludo, fechaNacimiento, imagen, fechaReg);
+		if (!encriptar) {
+			this.clave = clave;
+		}
+	}
+	
     public Usuario(String nombre, String apellidos, String telefono, String clave, String saludo, LocalDate fechaNacimiento, String imagen, LocalDate fechaReg) {
         this.nombre = nombre;
         this.apellidos = apellidos;

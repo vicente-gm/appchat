@@ -41,7 +41,7 @@ public class MensajeDAO_TDS implements MensajeDAO {
 	
 	private Mensaje entidadToMensaje(Entidad eMensaje){
 		String texto = servicioPersistencia.recuperarPropiedadEntidad(eMensaje, TEXTO);
-		LocalDate fecha = LocalDate.parse(servicioPersistencia.recuperarPropiedadEntidad(eMensaje, FECHA), DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy"));
+		LocalDateTime fecha = LocalDateTime.parse(servicioPersistencia.recuperarPropiedadEntidad(eMensaje, FECHA), DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy"));
 		String emisor = servicioPersistencia.recuperarPropiedadEntidad(eMensaje, EMISOR);
 		String receptor = servicioPersistencia.recuperarPropiedadEntidad(eMensaje, RECEPTOR);
 		String tipo = servicioPersistencia.recuperarPropiedadEntidad(eMensaje, TIPO);

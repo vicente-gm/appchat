@@ -37,7 +37,6 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
    		
    		try {
    			eUsuario = this.servicioPersistencia.recuperarEntidad(usuario.getId());
-   			
    			if (eUsuario != null) {
 		        throw new Exception("Error: el usuario ya existe.");
 		    }
@@ -64,7 +63,7 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
    						new Propiedad("Saludo", usuario.getSaludo()),
    						new Propiedad("RutaImagen", usuario.getImagen()),
    						new Propiedad("Contactos", obtenerCodigosContactos(usuario.getContactos()))
-   						)));
+   				)));
    		eUsuario = this.servicioPersistencia.registrarEntidad(eUsuario);
    		usuario.setId(eUsuario.getId());
     }
@@ -132,17 +131,22 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
 		boolean premium = Boolean.parseBoolean(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Premium"));
 		LocalDate nacimiento = LocalDate.parse(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Nacimiento"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		LocalDate registro = LocalDate.parse(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Registro"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		LocalDate fechaPremium = LocalDate.parse(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "FechaPremium"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+		LocalDate fechaPremium = null;
+		if (!servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "FechaPremium").equals("Null")) {
+			fechaPremium = LocalDate.parse(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "FechaPremium"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+	    }
+
 		String saludo = servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Saludo");
 		String urlImagen = servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "RutaImagen");
 		
-		Usuario usuario = new Usuario(nombre, apellido, telefono, password,  saludo, nacimiento, urlImagen, registro);
+		Usuario usuario = new Usuario(nombre, apellido, telefono, password,  saludo, nacimiento, urlImagen, registro, false);
 		usuario.setPremium(premium);
 		usuario.setFechaPremium(fechaPremium);
 		
 		PoolDAO.getInstance().addObject(id, usuario);
 		
-		List<Contacto> contactos = obtenerContactosDesdeIDs(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "contactos"));
+		List<Contacto> contactos = obtenerContactosIDs(servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Contactos"));
 		usuario.setId(id);
 		usuario.setContactos(contactos);
 		return usuario;
@@ -156,14 +160,12 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
     }
     
     private String obtenerCodigosContactos(List<Contacto> listaContactos) {
-		String aux = "";
-		for (Contacto c : listaContactos) {
-			aux += c.getId() + " ";
-		}
-		return aux.trim();
+		return listaContactos.stream()
+			    .map(c -> String.valueOf(c.getId()))
+			    .collect(Collectors.joining(" "));
 	}
     
-    private List<Contacto> obtenerContactosDesdeIDs(String idsContactos){
+    private List<Contacto> obtenerContactosIDs(String idsContactos){
 		List<Contacto> contactos = new LinkedList<Contacto>();
 		StringTokenizer strTok = new StringTokenizer(idsContactos, " ");
 		while ( strTok.hasMoreElements()) {

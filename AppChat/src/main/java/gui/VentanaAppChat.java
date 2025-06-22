@@ -341,7 +341,8 @@ public class VentanaAppChat extends JDialog {
 
         JPanel listaContactosPanel = new JPanel();
         listaContactosPanel.setLayout(new BoxLayout(listaContactosPanel, BoxLayout.Y_AXIS));
-
+        listaContactosPanel.add(Box.createRigidArea(new Dimension(250, 0)));
+        
         for (Contacto c : controlador.getContactos()) { 
         	
         	JPanel contactoPanel = new JPanel();
@@ -425,6 +426,7 @@ public class VentanaAppChat extends JDialog {
             panelNotificaciones.add(nuevosMensajesLabel, BorderLayout.EAST);
             panelNotificaciones.add(Box.createVerticalStrut(15));
             */
+            
             // Si el contacto es desconcido ponemos la opción de agregarlo
             if (!agregado) {
             	String telefono = telefonoContacto;
@@ -465,8 +467,13 @@ public class VentanaAppChat extends JDialog {
 
         // Panel de chat
         JPanel chatPanel = new JPanel(new BorderLayout());
-
-        JLabel chatConLabel = new JLabel("Mensajes con " + controlador.getNombreContactoActual());
+        
+        JLabel chatConLabel;
+        if (controlador.getNombreContactoActual() != null) {
+        	chatConLabel = new JLabel("Mensajes con " + controlador.getNombreContactoActual());
+        } else {
+        	chatConLabel = new JLabel("Todavía no hay chats");
+        }
         chatConLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         chatPanel.add(chatConLabel, BorderLayout.NORTH);
 

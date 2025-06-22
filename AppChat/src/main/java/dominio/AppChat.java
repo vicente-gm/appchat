@@ -2,7 +2,9 @@ package dominio;
 
 import java.awt.EventQueue;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +47,7 @@ public enum AppChat {
 		descuentos.add(new DescuentoPorMensajes());
 	}
 	
+	
 	public void registrarUsuario(String nombre, String apellidos, String telefono, String pass, String saludo, LocalDate fechaNacimiento, String rutaImagen) {
 		Usuario usuario = new Usuario(nombre, apellidos, telefono, pass, saludo, fechaNacimiento, rutaImagen, LocalDate.now());
 		RepositorioUsuarios.INSTANCE.guardarUsuario(usuario);
@@ -71,11 +74,17 @@ public enum AppChat {
 			if (existeContacto == null) { // Comprobamos si no existe ya en la lista de contactos (aunque no esté agregado)
 				ContactoIndividual contacto = new ContactoIndividual(usuario, nombre);
 				this.usuarioActual.addContacto(contacto);
+				
 				this.contactoIndividualDAO.registrarContactoIndividual(contacto);
+				this.usuarioDAO.modificarUsuario(this.usuarioActual);
+
 				return contacto;
 			} else {
 				// Si existe solo le cambiamos el nombre al nuevo elegido
 				existeContacto.setNombre(nombre);
+				
+				this.contactoIndividualDAO.modificaContactoIndividual(existeContacto);
+
 				return existeContacto;
 			}
 		}
@@ -83,7 +92,7 @@ public enum AppChat {
 		return null;
 	}
 	
-	public boolean login(String telefono, String clave) {
+	public boolean login(String telefono, String clave) {	
 		Usuario usuarioLogin = RepositorioUsuarios.INSTANCE.buscarUsuarioPorTelefono(telefono);
 		if (usuarioLogin != null) {
 			if (usuarioLogin.getClave().equals(Utils.encriptarMD5(clave))) {
@@ -135,6 +144,8 @@ public enum AppChat {
 		
 		contacto.addMensaje(mensaje);
 		this.mensajeDAO.registrarMensaje(mensaje);
+		this.contactoIndividualDAO.modificaContactoIndividual(contacto);
+
 		
 		Mensaje mensajeRecibido = new Mensaje(this.usuarioActual.getTelefono(), contacto.getTelefono(), texto, emoticono, TipoMensaje.RECIBIDO);
 
@@ -143,12 +154,14 @@ public enum AppChat {
 		if (contactoEnRecibidor == null) {
 			ContactoIndividual nuevoContactoSinAgregar = new ContactoIndividual(this.usuarioActual);
 			nuevoContactoSinAgregar.addMensaje(mensajeRecibido);
-			this.mensajeDAO.registrarMensaje(mensaje);
+			this.mensajeDAO.registrarMensaje(mensajeRecibido);
 			contacto.getUsuario().addContacto(nuevoContactoSinAgregar);
 			this.contactoIndividualDAO.registrarContactoIndividual(nuevoContactoSinAgregar);
+			this.usuarioDAO.modificarUsuario(contacto.getUsuario());
 		} else {
 			contactoEnRecibidor.addMensaje(mensajeRecibido);
-			this.mensajeDAO.registrarMensaje(mensaje);
+			this.mensajeDAO.registrarMensaje(mensajeRecibido);
+			this.contactoIndividualDAO.modificaContactoIndividual(contactoEnRecibidor);
 		}
 	}
 	
@@ -165,9 +178,10 @@ public enum AppChat {
 	public void enviarMensajeGrupo(Grupo grupo, String texto, int emoticono, TipoMensaje tipo) {
 		Mensaje mensaje = new Mensaje(this.usuarioActual.getTelefono(), grupo.getNombre(), texto, emoticono, tipo);
 		grupo.addMensaje(mensaje);
-		this.mensajeDAO.registrarMensaje(mensaje);	// Se envía el mensaje al grupo y a cada contacto
+		this.mensajeDAO.registrarMensaje(mensaje);	
+		this.grupoDAO.modificarGrupo(grupo);
 		
-		for (ContactoIndividual c : grupo.getMiembros()) {
+		for (ContactoIndividual c : grupo.getMiembros()) { // Se envía el mensaje al grupo y a cada contacto
 			enviarMensajeContacto(c, texto, emoticono, tipo);
 		}
 	}
@@ -210,7 +224,7 @@ public enum AppChat {
 	
 	public List<Mensaje> getMensajesContactoActual() {
 		if (this.contactoActual == null) {
-			return null;
+			return new ArrayList<Mensaje>();
 		}
 		return this.contactoActual.getMensajes();
 	}
@@ -220,10 +234,10 @@ public enum AppChat {
 			    .flatMap(contacto -> contacto.getMensajes().stream())
 			    .filter(mensaje -> mensaje.getEmisor().equals(this.usuarioActual.getTelefono()))
 			    .filter(mensaje -> {
-			        LocalDate fecha = mensaje.getFechaEnvio();
-			        LocalDate ahora = LocalDate.now();
-			        LocalDate primerDiaMesPasado = ahora.minusMonths(1).withDayOfMonth(1);
-			        LocalDate ultimoDiaMesPasado = ahora.withDayOfMonth(1).minusDays(1);
+			    	LocalDateTime fecha = mensaje.getFechaEnvio();
+			    	LocalDateTime ahora = LocalDateTime.now();
+			    	LocalDateTime primerDiaMesPasado = ahora.minusMonths(1).withDayOfMonth(1);
+			    	LocalDateTime ultimoDiaMesPasado = ahora.withDayOfMonth(1).minusDays(1);
 			        return !fecha.isBefore(primerDiaMesPasado) && !fecha.isAfter(ultimoDiaMesPasado);
 			    })
 			    .count();
@@ -277,5 +291,9 @@ public enum AppChat {
 	public void logout() {
 		this.usuarioActual = null;
 		this.contactoActual = null;
+	}
+	
+	public int getNumeroUsuariosRegistrados() { // Esta funcion solo se usa para cargar o no datos de ejemplo
+		return RepositorioUsuarios.INSTANCE.obtenerTodosUsuarios().size();
 	}
 }

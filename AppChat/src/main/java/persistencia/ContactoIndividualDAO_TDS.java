@@ -57,6 +57,7 @@ public class ContactoIndividualDAO_TDS implements ContactoIndividualDAO {
 
     @Override
     public void modificaContactoIndividual(ContactoIndividual contacto) {
+
     	Entidad eIndividual = servicioPersistencia.recuperarEntidad(contacto.getId());
 		for (Propiedad prop : eIndividual.getPropiedades()) {
 			if (prop.getNombre().equals(NOMBRE)) {
@@ -97,14 +98,13 @@ public class ContactoIndividualDAO_TDS implements ContactoIndividualDAO {
     }
     
     private String obtenerIDsMensajes(List<Mensaje> mensajes) {
-		String aux = "";
-		for (Mensaje mensaje : mensajes) {
-			aux += mensaje.getId() + " ";
-		}
-		return aux.trim();
+		return mensajes.stream()
+			    .map(m -> String.valueOf(m.getId()))
+			    .collect(Collectors.joining(" "));
 	}
 	
-    private List<Mensaje> obtenerMensajesDesdeIDs(String mensajes){
+    private List<Mensaje> obtenerMensajesIDs(String mensajes){
+
 		List<Mensaje> listaMensajes = new LinkedList<Mensaje>();
 		StringTokenizer strTok = new StringTokenizer(mensajes, " ");
 		while(strTok.hasMoreTokens()) {
@@ -120,7 +120,7 @@ public class ContactoIndividualDAO_TDS implements ContactoIndividualDAO {
     private ContactoIndividual entidadToIndividual(Entidad eIndividual) {
     	String nombre = servicioPersistencia.recuperarPropiedadEntidad(eIndividual, NOMBRE);
 		int usuario = Integer.parseInt(servicioPersistencia.recuperarPropiedadEntidad(eIndividual, USUARIO));
-		List<Mensaje> mensajes = obtenerMensajesDesdeIDs(servicioPersistencia.recuperarPropiedadEntidad(eIndividual, MENSAJES));
+		List<Mensaje> mensajes = obtenerMensajesIDs(servicioPersistencia.recuperarPropiedadEntidad(eIndividual, MENSAJES));
 		
 		
 		Usuario u = null;

@@ -98,22 +98,18 @@ public class GrupoDAO_TDS implements GrupoDAO {
     }
     
     private String obtenerIDsMensajes(List<Mensaje> mensajes) {
-		String aux = "";
-		for (Mensaje mensaje : mensajes) {
-			aux += mensaje.getId() + " ";
-		}
-		return aux.trim();
+		return mensajes.stream()
+			    .map(m -> String.valueOf(m.getId()))
+			    .collect(Collectors.joining(" "));
 	}
     
     private String obtenerIDsContactos(List<ContactoIndividual> contactos) {
-		String aux = "";
-		for (ContactoIndividual contacto : contactos) {
-			aux += contacto.getId() + " ";
-		}
-		return aux.trim();
+		return contactos.stream()
+			    .map(c -> String.valueOf(c.getId()))
+			    .collect(Collectors.joining(" "));
 	}
     
-    private List<Mensaje> obtenerMensajesDesdeIDs(String mensajes){
+    private List<Mensaje> obtenerMensajesIDs(String mensajes){
 		List<Mensaje> listaMensajes = new LinkedList<Mensaje>();
 		StringTokenizer strTok = new StringTokenizer(mensajes, " ");
 		while(strTok.hasMoreTokens()) {
@@ -126,7 +122,7 @@ public class GrupoDAO_TDS implements GrupoDAO {
 		return listaMensajes;
 	}
     
-    private List<ContactoIndividual> obtenerContactosDesdeIDs(String contactos){
+    private List<ContactoIndividual> obtenerContactosIDs(String contactos){
 		List<ContactoIndividual> listaContactos = new LinkedList<ContactoIndividual>();
 		StringTokenizer strTok = new StringTokenizer(contactos, " ");
 		while(strTok.hasMoreTokens()) {
@@ -141,8 +137,8 @@ public class GrupoDAO_TDS implements GrupoDAO {
     
     private Grupo entidadToGrupo(Entidad eGrupo) {
 		String nombre = servicioPersistencia.recuperarPropiedadEntidad(eGrupo, NOMBRE);
-		List<Mensaje> mensajes = obtenerMensajesDesdeIDs(servicioPersistencia.recuperarPropiedadEntidad(eGrupo, MENSAJES));
-		List<ContactoIndividual> contactos = obtenerContactosDesdeIDs(servicioPersistencia.recuperarPropiedadEntidad(eGrupo, CONTACTOS));
+		List<Mensaje> mensajes = obtenerMensajesIDs(servicioPersistencia.recuperarPropiedadEntidad(eGrupo, MENSAJES));
+		List<ContactoIndividual> contactos = obtenerContactosIDs(servicioPersistencia.recuperarPropiedadEntidad(eGrupo, CONTACTOS));
 		Grupo grupo = new Grupo(contactos, nombre);
 		grupo.setMensajes(mensajes);
 		grupo.setId(eGrupo.getId());
