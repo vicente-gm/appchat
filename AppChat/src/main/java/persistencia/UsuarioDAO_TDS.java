@@ -19,7 +19,7 @@ import tds.driver.ServicioPersistencia;
 public class UsuarioDAO_TDS implements UsuarioDAO {
 	
 	private ServicioPersistencia servicioPersistencia;
-	private static UsuarioDAO_TDS instancia;
+	private static UsuarioDAO_TDS instancia = null;
 	
 	public static UsuarioDAO_TDS getInstancia() {
 		if(instancia == null) instancia = new UsuarioDAO_TDS();
@@ -45,6 +45,7 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
 			eUsuario = null;
 		}
    		
+   		eUsuario = new Entidad();
    		eUsuario.setNombre("Usuario");
    		eUsuario.setPropiedades(new ArrayList<Propiedad>(
    				Arrays.asList(new Propiedad("Nombre", usuario.getNombre()),
@@ -104,7 +105,7 @@ public class UsuarioDAO_TDS implements UsuarioDAO {
     @Override
     public Usuario recuperarUsuario(int id) {
     	Entidad eUsuario = servicioPersistencia.recuperarEntidad(id);
-		if (eUsuario == null)	return null;
+		if (eUsuario == null) return null;
 		String nombre = servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Nombre");
 		String apellido = servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Apellido");
 		String password = servicioPersistencia.recuperarPropiedadEntidad(eUsuario, "Password");
