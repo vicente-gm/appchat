@@ -13,7 +13,6 @@ import java.awt.*;
 
 import com.toedter.calendar.JDateChooser;
 import dominio.*;
-import tds.BubbleText;
 
 public class VentanaRegistro extends JFrame {
 
@@ -179,8 +178,7 @@ public class VentanaRegistro extends JFrame {
 	            	if (ruta.toLowerCase().endsWith(".jpeg") || ruta.toLowerCase().endsWith(".jpg") || ruta.toLowerCase().endsWith(".png")) {
 	            		ImageIcon nuevaImagen = new ImageIcon(ruta);
 	            		Image nuevaImagenRedimensionada = nuevaImagen.getImage().getScaledInstance(125, 125 * (4/3), Image.SCALE_SMOOTH);
-	                    
-	            		rutaImagen = ruta;
+	            		rutaImagen = dominio.Utils.getRutaResourceFromFile(imagenElegida);
 	                    placeholderImagen.setIcon(new ImageIcon(nuevaImagenRedimensionada));
 	            	} else {
 	            		JOptionPane.showMessageDialog(VentanaRegistro.this, "Formato de archivo inválido.");

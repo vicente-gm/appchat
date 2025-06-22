@@ -11,6 +11,7 @@ import javax.swing.*;
 import dominio.AppChat;
 
 public class VentanaCrearContacto extends JDialog {
+
 	private String telefono;
 	private AppChat controlador;
 	

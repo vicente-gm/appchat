@@ -12,7 +12,6 @@ import beans.Propiedad;
 import dominio.ContactoIndividual;
 import dominio.Grupo;
 import dominio.Mensaje;
-import dominio.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 
@@ -20,7 +19,6 @@ public class GrupoDAO_TDS implements GrupoDAO {
 	private static final String NOMBRE = "nombre";
 	private static final String MENSAJES = "mensajes";
 	private static final String CONTACTOS = "contactos";
-	private static final String RUTAIMAGEN = "RutaImagen";
 	
 	private ServicioPersistencia servicioPersistencia;
 	private static GrupoDAO_TDS instancia;

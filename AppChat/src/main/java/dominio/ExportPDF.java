@@ -40,6 +40,11 @@ public class ExportPDF {
 	        // Mensajes
 	        mensajes.stream().forEach(m -> {
 	        	String texto = m.getTexto();
+	        	
+	        	if (m.getEmoticono() != -1) {
+	        		texto = "*emoji*";
+	        	}
+	        	
 	        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
 	        	String fecha = m.getFechaEnvio().format(formatter);
 	        	TipoMensaje tipo = m.getTipoMensaje();

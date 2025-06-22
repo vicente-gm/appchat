@@ -2,14 +2,13 @@ package dominio;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Usuario {
 
 	private String nombre, apellidos, telefono, clave, saludo;
 	private LocalDate fechaNacimiento;
-	private final LocalDate fechaRegistro;
+	private LocalDate fechaRegistro;
 	private String imagen;
 	private boolean premium;
 	private LocalDate fechaPremium;
@@ -115,6 +114,10 @@ public class Usuario {
 
     public void setSaludo(String saludo) {
         this.saludo = saludo;
+    }
+    
+    public void setFechaRegistro(LocalDate f) { // Solo se usa para la prueba del descuento por fecha de registro
+    	this.fechaRegistro = f;
     }
 
     public ContactoIndividual buscarContactoIndividual(String telefono) {

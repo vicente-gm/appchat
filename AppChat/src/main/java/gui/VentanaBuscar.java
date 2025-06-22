@@ -21,7 +21,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 import dominio.AppChat;
-import dominio.ContactoIndividual;
 import dominio.Mensaje;
 
 public class VentanaBuscar extends JDialog {

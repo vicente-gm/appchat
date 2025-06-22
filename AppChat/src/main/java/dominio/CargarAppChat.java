@@ -9,11 +9,11 @@ public class CargarAppChat {
 		AppChat appChat = AppChat.INSTANCE;
 		
 		if (appChat.getNumeroUsuariosRegistrados() == 0) {
-			appChat.registrarUsuario("Jesús", "Martínez", "11", "11", "Hola, soy Jesus", LocalDate.of(1960, 10, 03),"/usuarios/user.jpeg");
-			appChat.registrarUsuario("Elena","Carrasco", "22", "22", "Hola, soy Elena", LocalDate.of(1995, 12, 28), "/usuarios/user.jpeg");
-			appChat.registrarUsuario("Rosalía", "Hernández", "33", "33", "Hola, soy Rosalia", LocalDate.of(2000, 5, 15), "/usuarios/user.jpeg");
-			appChat.registrarUsuario("Diego", "Belmonte", "44", "44", "Hola, soy Diego", LocalDate.of(1970, 5, 11), "/usuarios/user.jpeg");
-			appChat.registrarUsuario("Anne", "Smith", "55", "55", "Hola, soy Anne", LocalDate.of(1990, 3, 28), "/usuarios/user.jpeg");
+			appChat.registrarUsuario("Jesús", "Martínez", "11", "11", "Hola, soy Jesus", LocalDate.of(1960, 10, 03),"/usuarios/jesus.jpeg");
+			appChat.registrarUsuario("Elena","Carrasco", "22", "22", "Hola, soy Elena", LocalDate.of(1995, 12, 28), "/usuarios/elena.jpeg");
+			appChat.registrarUsuario("Rosalía", "Hernández", "33", "33", "Hola, soy Rosalia", LocalDate.of(2000, 5, 15), "/usuarios/rosalia.jpeg");
+			appChat.registrarUsuario("Diego", "Belmonte", "44", "44", "Hola, soy Diego", LocalDate.of(1970, 5, 11), "/usuarios/diego.jpeg");
+			appChat.registrarUsuario("Anne", "Smith", "55", "55", "Hola, soy Anne", LocalDate.of(1990, 3, 28), "/usuarios/anne.jpeg");
 			
 			appChat.login("11", "11");
 			
@@ -31,6 +31,19 @@ public class CargarAppChat {
 		    System.out.println("Fin de la carga de datos");
 		} else {
 		    System.out.println("Ya hay " + Integer.toString(appChat.getNumeroUsuariosRegistrados()) + " usuarios registrados, no se cargarán de nuevo los datos de ejemplo");
+		    
+		    /*  // PARA PROBAR EL DESCUENTO POR EL NUMERO DE MENSAJES
+		    appChat.login("11", "11");
+		    for (int i = 0; i < 100; i++) {
+		    	appChat.enviarMensajeContacto(appChat.buscarContactoIndividual("11"), "Hola, ¿cómo estás?", -1, TipoMensaje.ENVIADO);
+		    }
+		    appChat.logout();
+		    */
+		    
+		    /*
+		    // PARA PROBAR DESCUENTO POR MES
+		    appChat.buscarUsuario("22").setFechaRegistro(LocalDate.of(2025, 2, 18));
+		    */
 		}
 	}
 

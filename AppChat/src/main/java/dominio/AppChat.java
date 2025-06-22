@@ -1,6 +1,5 @@
 package dominio;
 
-import java.awt.EventQueue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -173,6 +172,7 @@ public enum AppChat {
 		Grupo nuevoGrupo = new Grupo(miembros, nombreGrupo);
 		this.usuarioActual.addContacto(nuevoGrupo);
 		this.grupoDAO.registrarGrupo(nuevoGrupo);
+		this.usuarioDAO.modificarUsuario(this.usuarioActual);
 	}
 	
 	public void enviarMensajeGrupo(Grupo grupo, String texto, int emoticono, TipoMensaje tipo) {
@@ -236,9 +236,8 @@ public enum AppChat {
 			    .filter(mensaje -> {
 			    	LocalDateTime fecha = mensaje.getFechaEnvio();
 			    	LocalDateTime ahora = LocalDateTime.now();
-			    	LocalDateTime primerDiaMesPasado = ahora.minusMonths(1).withDayOfMonth(1);
-			    	LocalDateTime ultimoDiaMesPasado = ahora.withDayOfMonth(1).minusDays(1);
-			        return !fecha.isBefore(primerDiaMesPasado) && !fecha.isAfter(ultimoDiaMesPasado);
+			    	LocalDateTime primerDiaMesPasado = ahora.minusMonths(1);
+			        return !fecha.isBefore(primerDiaMesPasado);
 			    })
 			    .count();
 	}
@@ -267,10 +266,18 @@ public enum AppChat {
 	}
 	
 	public boolean crearPDF(String ruta, String contacto) {
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        String fecha = LocalDate.now().format(formato);
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy.HH.mm");
+        String fecha = LocalDateTime.now().format(formato);
         
-		return this.generadorPDF.crearPDF(ruta + "mensajes-" + contacto + "-" + fecha, contacto);
+        if (!ruta.endsWith("/")) {
+        	if (ruta.contains("\\")) {
+        		ruta += "\\";
+        	} else {
+        		ruta += "/";
+        	}
+        }
+        
+		return this.generadorPDF.crearPDF(ruta + "mensajes-" + contacto + "-" + fecha + ".pdf", contacto);
 	}
 	
 	public List<Mensaje> getMensajesContacto(String contacto) {

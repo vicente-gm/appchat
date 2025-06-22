@@ -1,6 +1,5 @@
 package persistencia;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -10,10 +9,8 @@ import java.util.stream.Collectors;
 
 import beans.Entidad;
 import beans.Propiedad;
-import dominio.Contacto;
 import dominio.Mensaje;
 import dominio.TipoMensaje;
-import dominio.Usuario;
 import tds.driver.FactoriaServicioPersistencia;
 import tds.driver.ServicioPersistencia;
 

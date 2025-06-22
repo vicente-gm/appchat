@@ -1,7 +1,5 @@
 package persistencia;
 
-import tds.driver.ServicioPersistencia.*;
-
 public abstract class FactoriaDAO {
 	private static FactoriaDAO instancia;
 	

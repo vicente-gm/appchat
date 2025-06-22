@@ -110,7 +110,7 @@ public class VentanaCrearGrupo extends JDialog {
 		    public void actionPerformed(ActionEvent e) {
 		    	String nombreGrupo = nombreGrupoField.getText().trim();
 		    	
-		    	List<String> seleccionados = new ArrayList();
+		    	List<String> seleccionados = new ArrayList<String>();
 		    	for (int i = 0; i < modeloAnadidos.getSize(); i++) {
 		    		seleccionados.add(modeloAnadidos.getElementAt(i));
 		    	}

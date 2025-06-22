@@ -7,7 +7,6 @@ import javax.swing.event.DocumentListener;
 import dominio.*;
 
 import java.awt.*;
-import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -41,9 +40,15 @@ public class VentanaAppChat extends JDialog {
         // Panel superior
         JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        // Hacemos resize a la imagen de usuario
-        ImageIcon imagen = new ImageIcon(getClass().getResource(controlador.getImagen()));
-        Image resizedImagen = imagen.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon imagen;
+        try {
+        	imagen = new ImageIcon(getClass().getResource(controlador.getImagen()));
+        } catch (NullPointerException e) {
+        	File file = new File(controlador.getImagen());
+        	imagen = new ImageIcon(file.getAbsolutePath());
+        } 
+        
+        Image resizedImagen = imagen.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Hacemos resize a la imagen de usuario
         JLabel usuarioActual = new JLabel(new ImageIcon(resizedImagen));
         panelSuperior.add(usuarioActual);
         
@@ -118,7 +123,7 @@ public class VentanaAppChat extends JDialog {
                 aceptarBtn.addActionListener(e -> {
                     if (rutaImagenSeleccionada[0] != null) {
                         usuarioActual.setIcon(nuevaIcono[0]);
-                        controlador.cambiarImagen(rutaImagenSeleccionada[0]); // TODO: revisar el tema de cómo se almacena la imagen
+                        controlador.cambiarImagen(rutaImagenSeleccionada[0]);
                     }
 
                     String nuevoSaludo = campoSaludo.getText();
@@ -378,6 +383,7 @@ public class VentanaAppChat extends JDialog {
             	fotoUsuario = ((ContactoIndividual) c).getImagen();
             } else {
             	miembrosGrupo = ((Grupo) c).getMiembros().stream().map(ContactoIndividual::getNombre).collect(Collectors.joining("<br>"));
+            	fotoUsuario = "/usuarios/grupo.jpg";
             }
             
             // Nos aseguramos si el contacto está agregado
@@ -394,7 +400,14 @@ public class VentanaAppChat extends JDialog {
             
             
             // Foto contacto
-        	ImageIcon imagenContacto = new ImageIcon(getClass().getResource(fotoUsuario));
+        	ImageIcon imagenContacto;
+        	try {
+        		imagenContacto = new ImageIcon(getClass().getResource(fotoUsuario));
+            } catch (NullPointerException e) {
+            	File file = new File(fotoUsuario);
+            	imagenContacto = new ImageIcon(file.getAbsolutePath());
+            } 
+            
             JLabel fotoContactoLabel = new JLabel(new ImageIcon(imagenContacto.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
             fotoContactoLabel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
             contactoPanel.add(fotoContactoLabel, BorderLayout.WEST);
@@ -586,7 +599,6 @@ public class VentanaAppChat extends JDialog {
 		    	if (controlador.getContactoActual() instanceof ContactoIndividual) {
 		    		controlador.enviarMensajeContacto((ContactoIndividual) controlador.getContactoActual(), mensaje, -1, TipoMensaje.ENVIADO);
 		    	} else { // Si es un grupo enviamos el mensaje a todos los miembros
-		    		// Todo grupo
 		    		controlador.enviarMensajeGrupo((Grupo) controlador.getContactoActual(), mensaje, -1, TipoMensaje.ENVIADO_GRUPO);
 		    	}
 		    	
